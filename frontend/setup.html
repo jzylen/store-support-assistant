@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Set Up Your Store Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+      padding: 40px;
+    }
+
+    h1 {
+      max-width: 600px;
+      margin: auto;
+      margin-bottom: 20px;
+    }
+
+    p {
+      max-width: 600px;
+      margin: auto;
+      margin-bottom: 20px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    form {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .row {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #111;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Set up your store assistant</h1>
+<p>
+Tell your AI assistant how your store works.  
+It will answer customer questions using only this information.
+</p>
+
+<form id="setupForm">
+
+  <div class="row">
+    <label>Shipping time</label>
+    <div class="hint">Example: Orders ship within 2–3 business days</div>
+    <input id="shipping_time" type="text" value="Orders ship within 2–3 business days." />
+  </div>
+
+  <div class="row">
+    <label>Order tracking</label>
+    <div class="hint">Explain how customers track their orders</div>
+    <input id="order_tracking" type="text" value="Once shipped, customers receive a tracking link via email." />
+  </div>
+
+  <div class="row">
+    <label>Return policy</label>
+    <div class="hint">Summarize your returns policy</div>
+    <input id="returns" type="text" value="Returns are accepted within 30 days of delivery." />
+  </div>
+
+  <div class="row">
+    <label>Refund timeline</label>
+    <div class="hint">How long refunds take after approval</div>
+    <input id="refunds" type="text" value="Refunds are processed within 5–7 business days." />
+  </div>
+
+  <div class="row">
+    <label>Customer support contact</label>
+    <div class="hint">Where customers should go if the AI can’t help</div>
+    <input id="support" type="text" value="Email support@yourstore.com for further assistance." />
+  </div>
+
+  <button type="submit">Save & Continue</button>
+  <div id="error" class="error"></div>
+</form>
+
+<script>
+  const API_URL = "http://127.0.0.1:8000";
+
+  const businessId = localStorage.getItem("business_id");
+  if (!businessId) {
+    alert("No business found. Please start again.");
+    window.location.href = "create.html";
+  }
+
+  document.getElementById("setupForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const data = {
+      shipping_time: {
+        value: document.getElementById("shipping_time").value,
+        enabled: true
+      },
+      order_tracking: {
+        value: document.getElementById("order_tracking").value,
+        enabled: true
+      },
+      returns: {
+        value: document.getElementById("returns").value,
+        enabled: true
+      },
+      refunds: {
+        value: document.getElementById("refunds").value,
+        enabled: true
+      },
+      support: {
+        value: document.getElementById("support").value,
+        enabled: true
+      }
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/onboard/data`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          business_id: businessId,
+          data
+        })
+      });
+
+      const result = await res.json();
+      if (result.status !== "saved") {
+        throw new Error("Save failed");
+      }
+
+      window.location.href = "success.html";
+
+    } catch (err) {
+      document.getElementById("error").innerText =
+        "Failed to save store data. Please try again.";
+    }
+  };
+</script>
+
+</body>
+</html>

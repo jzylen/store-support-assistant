@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Online Store Support Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #111;
+    }
+
+    header {
+      padding: 60px 20px;
+      text-align: center;
+      background: white;
+    }
+
+    header h1 {
+      font-size: 34px;
+      margin-bottom: 16px;
+    }
+
+    header p {
+      font-size: 18px;
+      color: #555;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .section {
+      padding: 50px 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .feature {
+      background: white;
+      padding: 22px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .feature h3 {
+      margin-top: 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      font-size: 14px;
+      color: #777;
+    }
+
+    /* ---------- CHAT WIDGET ---------- */
+
+    #chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #111;
+      color: white;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      z-index: 9999;
+    }
+
+    #chat-box {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 340px;
+      height: 440px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      display: none;
+      flex-direction: column;
+      z-index: 9999;
+    }
+
+    #chat-header {
+      background: #111;
+      color: white;
+      padding: 12px;
+      border-radius: 12px 12px 0 0;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #chat-messages {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    .message {
+      max-width: 80%;
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      line-height: 1.4;
+    }
+
+    .user {
+      margin-left: auto;
+      background: #DCF8C6;
+    }
+
+    .bot {
+      margin-right: auto;
+      background: #F1F0F0;
+    }
+
+    #chat-input {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    #chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+
+    #chat-input button {
+      padding: 10px;
+      background: #111;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Automated Customer Support for Online Stores</h1>
+  <p>
+    This AI assistant answers common customer questions about shipping,
+    order tracking, returns, and refunds — instantly and accurately.
+    Try it below.
+  </p>
+</header>
+
+<section class="section">
+  <div class="features">
+    <div class="feature">
+      <h3>📦 Shipping Questions</h3>
+      <p>“How long does shipping take?”</p>
+    </div>
+    <div class="feature">
+      <h3>🔎 Order Tracking</h3>
+      <p>“How do I track my order?”</p>
+    </div>
+    <div class="feature">
+      <h3>↩️ Returns & Refunds</h3>
+      <p>“What’s your return policy?”</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Live demo • AI support assistant for online stores
+</footer>
+
+<!-- CHAT WIDGET -->
+<button id="chat-toggle">💬</button>
+
+<div id="chat-box">
+  <div id="chat-header">Chat with store support</div>
+  <div id="chat-messages"></div>
+  <div id="chat-input">
+    <input id="messageInput" placeholder="Ask about shipping, returns, or orders…" />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  const BUSINESS_ID = localStorage.getItem("business_id");
+  const API_URL = "http://127.0.0.1:8000/chat";
+
+  const toggle = document.getElementById("chat-toggle");
+  const box = document.getElementById("chat-box");
+  const messages = document.getElementById("chat-messages");
+  const input = document.getElementById("messageInput");
+
+  toggle.onclick = () => {
+    box.style.display = box.style.display === "flex" ? "none" : "flex";
+    if (messages.children.length === 0) {
+      addMessage(
+        "Hi 👋 I can help with shipping, order tracking, returns, and refunds.",
+        "bot"
+      );
+    }
+  };
+
+  function addMessage(text, sender) {
+    const div = document.createElement("div");
+    div.className = `message ${sender}`;
+    div.innerText = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addMessage(msg, "user");
+    input.value = "";
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        business_id: BUSINESS_ID,
+        message: msg
+      })
+    });
+
+    const data = await res.json();
+    addMessage(data.reply || "No response", "bot");
+  }
+</script>
+
+</body>
+</html>

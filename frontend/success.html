@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your Bot Is Ready</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    p {
+      color: #555;
+      font-size: 15px;
+    }
+
+    pre {
+      background: #111;
+      color: #0f0;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 16px;
+      font-size: 14px;
+      background: #111;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .success {
+      color: green;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="success">✅ Setup complete</div>
+  <h1>Your AI bot is ready</h1>
+
+  <p>
+    Copy and paste the code below into your website
+    before the closing <code>&lt;/body&gt;</code> tag.
+  </p>
+
+  <pre id="snippet"></pre>
+
+  <button onclick="copySnippet()">Copy Code</button>
+</div>
+
+<script>
+  const businessId = localStorage.getItem("business_id");
+
+  if (!businessId) {
+    alert("No business found. Please start again.");
+    window.location.href = "create.html";
+  }
+
+  const snippet =
+`<script>
+(function () {
+  const script = document.createElement("script");
+  script.src = "widget.js";
+  script.dataset.business = "${businessId}";
+  document.body.appendChild(script);
+})();
+<\/script>`;
+
+  document.getElementById("snippet").innerText = snippet;
+
+  function copySnippet() {
+    navigator.clipboard.writeText(snippet);
+    alert("Widget code copied!");
+  }
+</script>
+
+</body>
+</html>

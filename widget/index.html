@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Chat Widget</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #111;
+      color: white;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+    }
+
+    #chat-box {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 320px;
+      height: 420px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      display: none;
+      flex-direction: column;
+    }
+
+    #chat-header {
+      background: #111;
+      color: white;
+      padding: 12px;
+      border-radius: 12px 12px 0 0;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #chat-messages {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    .message {
+      max-width: 80%;
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      line-height: 1.4;
+    }
+
+    .user {
+      margin-left: auto;
+      background: #DCF8C6;
+      text-align: right;
+    }
+
+    .bot {
+      margin-right: auto;
+      background: #F1F0F0;
+      text-align: left;
+    }
+
+    .typing {
+      font-style: italic;
+      font-size: 12px;
+      color: #666;
+    }
+
+    #chat-input {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    #chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+
+    #chat-input button {
+      padding: 10px 14px;
+      background: #111;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #chat-input button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+<button id="chat-toggle">💬</button>
+
+<div id="chat-box">
+  <div id="chat-header">Chat with us</div>
+  <div id="chat-messages"></div>
+  <div id="chat-input">
+    <input type="text" id="messageInput" placeholder="Type a message..." />
+    <button id="sendBtn">Send</button>
+  </div>
+</div>
+
+<script>
+  const chatToggle = document.getElementById("chat-toggle");
+  const chatBox = document.getElementById("chat-box");
+  const messagesDiv = document.getElementById("chat-messages");
+  const input = document.getElementById("messageInput");
+  const sendBtn = document.getElementById("sendBtn");
+
+  const BUSINESS_ID = "516fdc82-5190-44bb-95a6-48d2ea37813b";
+  const API_URL = "http://127.0.0.1:8000/chat";
+
+  let openedOnce = false;
+
+  chatToggle.onclick = () => {
+    chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
+
+    if (!openedOnce) {
+      addMessage(
+        "Hi 👋 I’m here to help with check-in times, Wi-Fi, and other hotel questions.",
+        "bot"
+      );
+      openedOnce = true;
+    }
+  };
+
+  function addMessage(text, sender) {
+    const msg = document.createElement("div");
+    msg.className = `message ${sender}`;
+    msg.innerText = text;
+    messagesDiv.appendChild(msg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  function showTyping() {
+    const typing = document.createElement("div");
+    typing.className = "typing";
+    typing.id = "typing";
+    typing.innerText = "Bot is typing…";
+    messagesDiv.appendChild(typing);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  function removeTyping() {
+    const typing = document.getElementById("typing");
+    if (typing) typing.remove();
+  }
+
+  async function sendMessage() {
+    const message = input.value.trim();
+    if (!message) return;
+
+    addMessage(message, "user");
+    input.value = "";
+    sendBtn.disabled = true;
+
+    showTyping();
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          business_id: BUSINESS_ID,
+          message: message
+        })
+      });
+
+      const data = await response.json();
+      removeTyping();
+      addMessage(data.reply || "No response", "bot");
+
+    } catch {
+      removeTyping();
+      addMessage("Error connecting to server.", "bot");
+    }
+
+    sendBtn.disabled = false;
+    input.focus();
+  }
+
+  sendBtn.onclick = sendMessage;
+
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
+</script>
+
+</body>
+</html>

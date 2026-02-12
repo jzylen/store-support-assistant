@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Automate Your Store’s Customer Support</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      padding: 32px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 26px;
+    }
+
+    p {
+      color: #555;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    ul {
+      padding-left: 18px;
+      color: #444;
+      font-size: 14px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 14px;
+      margin-bottom: 18px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      background: #111;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #888;
+      cursor: not-allowed;
+    }
+
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Automate your store’s customer support</h1>
+
+    <p>
+      Instantly reduce customer support tickets by letting an AI assistant
+      answer common questions about shipping, returns, and orders — 24/7.
+    </p>
+
+    <ul>
+      <li>Answer “Where is my order?” automatically</li>
+      <li>Handle shipping & return questions instantly</li>
+      <li>Reduce repetitive support emails</li>
+    </ul>
+
+    <p><strong>Create your store assistant in under 2 minutes.</strong></p>
+
+    <input
+      id="businessName"
+      type="text"
+      placeholder="Your store name (e.g. Urban Streetwear)"
+    />
+
+    <button id="createBtn">Create My Store Assistant</button>
+
+    <div id="error" class="error"></div>
+  </div>
+
+<script>
+  const API_URL = "http://127.0.0.1:8000";
+
+  const button = document.getElementById("createBtn");
+  const input = document.getElementById("businessName");
+  const errorDiv = document.getElementById("error");
+
+  button.onclick = async () => {
+    errorDiv.innerText = "";
+
+    const name = input.value.trim();
+    if (!name) {
+      errorDiv.innerText = "Please enter your store name.";
+      return;
+    }
+
+    button.disabled = true;
+    button.innerText = "Creating assistant...";
+
+    try {
+      const res = await fetch(`${API_URL}/onboard/business`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+      });
+
+      const data = await res.json();
+
+      if (!data.business_id) {
+        throw new Error("Invalid response");
+      }
+
+      localStorage.setItem("business_id", data.business_id);
+      localStorage.setItem("business_name", data.name);
+
+      window.location.href = "setup.html";
+
+    } catch (err) {
+      errorDiv.innerText =
+        "Failed to create assistant. Make sure the server is running.";
+      button.disabled = false;
+      button.innerText = "Create My Store Assistant";
+    }
+  };
+</script>
+
+</body>
+</html>
