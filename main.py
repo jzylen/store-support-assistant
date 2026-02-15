@@ -1,16 +1,15 @@
+from fastapi import FastAPI, HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi import Security
-from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from database import init_db, get_connection
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+from openai import OpenAI
 import uuid
 import os
-from openai import OpenAI
 
-app = FastAPI()
+app = FastAPI(title="Relixo API", version="1.0.0")
 
 security = HTTPBearer()
 
@@ -18,16 +17,18 @@ init_db()
 
 client = OpenAI()
 
-SECRET_KEY = "relixo_ai_saas_startup"
+SECRET_KEY = "relixo_super_secret_key_123456789"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
 
-pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+pwd_context = CryptContext(
+    schemes=["argon2"],
+    deprecated="auto"
+)
 
-
-# ----------------------
+# -----------------------
 # MODELS
-# ----------------------
+# -----------------------
 
 class RegisterRequest(BaseModel):
     email: str
@@ -42,9 +43,9 @@ class ChatRequest(BaseModel):
     message: str
 
 
-# ----------------------
+# -----------------------
 # AUTH HELPERS
-# ----------------------
+# -----------------------
 
 def hash_password(password):
     return pwd_context.hash(password)
@@ -69,52 +70,48 @@ def get_current_user(token: str):
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
-# ----------------------
+# -----------------------
 # REGISTER
-# ----------------------
+# -----------------------
 
-@app.post("/chat")
-def chat(
-    data: ChatRequest,
-    credentials: HTTPAuthorizationCredentials = Security(security)
-):
-    token = credentials.credentials
-    email = get_current_user(token)
-
+@app.post("/auth/register")
+def register(data: RegisterRequest):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT business_id FROM users WHERE email = ?", (email,))
-    result = cursor.fetchone()
+    business_id = str(uuid.uuid4())
 
-    if not result:
+    try:
+        cursor.execute("""
+            INSERT INTO businesses (id, name, created_at)
+            VALUES (?, ?, ?)
+        """, (business_id, data.business_name, datetime.utcnow().isoformat()))
+
+        cursor.execute("""
+            INSERT INTO users (email, password_hash, business_id, created_at)
+            VALUES (?, ?, ?, ?)
+        """, (
+            data.email,
+            hash_password(data.password),
+            business_id,
+            datetime.utcnow().isoformat()
+        ))
+
+        conn.commit()
+
+    except Exception as e:
         conn.close()
-        raise HTTPException(status_code=404, detail="User not found")
-
-    business_id = result["business_id"]
-
-    cursor.execute("SELECT data FROM businesses WHERE id = ?", (business_id,))
-    business = cursor.fetchone()
+        raise HTTPException(status_code=400, detail=str(e))
 
     conn.close()
 
-    if not business or not business["data"]:
-        return {"reply": "No business data configured yet."}
-
-    response = client.responses.create(
-        model="gpt-4o-mini",
-        input=[
-            {"role": "system", "content": business["data"]},
-            {"role": "user", "content": data.message}
-        ]
-    )
-
-    return {"reply": response.output_text}
+    token = create_access_token({"sub": data.email})
+    return {"access_token": token}
 
 
-# ----------------------
+# -----------------------
 # LOGIN
-# ----------------------
+# -----------------------
 
 @app.post("/auth/login")
 def login(data: LoginRequest):
@@ -136,12 +133,16 @@ def login(data: LoginRequest):
     return {"access_token": token}
 
 
-# ----------------------
+# -----------------------
 # CHAT (PROTECTED)
-# ----------------------
+# -----------------------
 
 @app.post("/chat")
-def chat(data: ChatRequest, token: str):
+def chat(
+    data: ChatRequest,
+    credentials: HTTPAuthorizationCredentials = Security(security)
+):
+    token = credentials.credentials
     email = get_current_user(token)
 
     conn = get_connection()
