@@ -73,41 +73,43 @@ def get_current_user(token: str):
 # REGISTER
 # ----------------------
 
-@app.post("/auth/register")
-def register(data: RegisterRequest):
+@app.post("/chat")
+def chat(
+    data: ChatRequest,
+    credentials: HTTPAuthorizationCredentials = Security(security)
+):
+    token = credentials.credentials
+    email = get_current_user(token)
+
     conn = get_connection()
     cursor = conn.cursor()
 
-    business_id = str(uuid.uuid4())
+    cursor.execute("SELECT business_id FROM users WHERE email = ?", (email,))
+    result = cursor.fetchone()
 
-    try:
-        # Create business
-        cursor.execute("""
-            INSERT INTO businesses (id, name, created_at)
-            VALUES (?, ?, ?)
-        """, (business_id, data.business_name, datetime.utcnow().isoformat()))
-
-        # Create user
-        cursor.execute("""
-            INSERT INTO users (email, password_hash, business_id, created_at)
-            VALUES (?, ?, ?, ?)
-        """, (
-            data.email,
-            hash_password(data.password),
-            business_id,
-            datetime.utcnow().isoformat()
-        ))
-
-        conn.commit()
-
-    except Exception as e:
+    if not result:
         conn.close()
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=404, detail="User not found")
+
+    business_id = result["business_id"]
+
+    cursor.execute("SELECT data FROM businesses WHERE id = ?", (business_id,))
+    business = cursor.fetchone()
 
     conn.close()
 
-    token = create_access_token({"sub": data.email})
-    return {"access_token": token}
+    if not business or not business["data"]:
+        return {"reply": "No business data configured yet."}
+
+    response = client.responses.create(
+        model="gpt-4o-mini",
+        input=[
+            {"role": "system", "content": business["data"]},
+            {"role": "user", "content": data.message}
+        ]
+    )
+
+    return {"reply": response.output_text}
 
 
 # ----------------------
