@@ -1,101 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Live Store Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial;
-      background: #f4f4f4;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px;
-    }
+from fastapi import Header
 
-    #chatBox {
-      width: 100%;
-      max-width: 600px;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      height: 400px;
-      overflow-y: auto;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
+@app.post("/chat")
+def chat(
+    data: ChatRequest,
+    authorization: str = Header(None)
+):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing token")
 
-    .msg {
-      margin-bottom: 15px;
-    }
+    token = authorization.split(" ")[1]
+    email = get_current_user(token)
 
-    .user {
-      font-weight: bold;
-    }
+    conn = get_connection()
+    cursor = conn.cursor()
 
-    input {
-      width: 100%;
-      max-width: 600px;
-      padding: 12px;
-      margin-top: 15px;
-      font-size: 16px;
-    }
-  </style>
-</head>
-<body>
+    cursor.execute("SELECT business_id FROM users WHERE email = ?", (email,))
+    result = cursor.fetchone()
 
-<h2>Live AI Store Assistant</h2>
+    if not result:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
 
-<div id="chatBox"></div>
+    business_id = result["business_id"]
 
-<input
-  type="text"
-  id="messageInput"
-  placeholder="Ask a question..."
-  onkeypress="handleKey(event)"
-/>
+    cursor.execute("SELECT data FROM businesses WHERE id = ?", (business_id,))
+    business = cursor.fetchone()
 
-<script>
-  const API_URL = "https://store-support-backend-v2.onrender.com";
+    conn.close()
 
-  const business_id = localStorage.getItem("business_id");
+    if not business or not business["data"]:
+        return {"reply": "No business data configured yet."}
 
-  const chatBox = document.getElementById("chatBox");
+    response = client.responses.create(
+        model="gpt-4o-mini",
+        input=[
+            {"role": "system", "content": business["data"]},
+            {"role": "user", "content": data.message}
+        ]
+    )
 
-  function addMessage(text, sender) {
-    const div = document.createElement("div");
-    div.classList.add("msg");
-    div.innerHTML = `<span class="${sender}">${sender}:</span> ${text}`;
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  async function sendMessage(message) {
-    addMessage(message, "user");
-
-    const response = await fetch(`${API_URL}/chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        business_id: business_id,
-        message: message
-      })
-    });
-
-    const data = await response.json();
-    addMessage(data.reply, "AI");
-  }
-
-  function handleKey(event) {
-    if (event.key === "Enter") {
-      const input = document.getElementById("messageInput");
-      const message = input.value;
-      input.value = "";
-      sendMessage(message);
-    }
-  }
-</script>
-
-</body>
-</html>
+    return {"reply": response.output_text}
