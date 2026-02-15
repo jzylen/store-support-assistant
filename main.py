@@ -1,243 +1,167 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
-from openai import OpenAI
-import sqlite3
-from datetime import datetime
+from database import init_db, get_connection
+from passlib.context import CryptContext
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
 import uuid
+import os
+from openai import OpenAI
 
 app = FastAPI()
-client = OpenAI()
 
-DB_PATH = "data.db"
-
-PLANS = {
-    "starter": 1000,
-    "growth": 5000,
-    "pro": 15000
-}
-
-# ---------- CORS ----------
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ---------- DATABASE ----------
-
-def get_db():
-    return sqlite3.connect(DB_PATH)
-
-def init_db():
-    db = get_db()
-    cur = db.cursor()
-
-    # Businesses table
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS businesses (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        plan TEXT NOT NULL DEFAULT 'starter',
-        active INTEGER NOT NULL DEFAULT 1,
-        created_at TEXT NOT NULL
-    )
-    """)
-
-    # Business data table
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS business_data (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        business_id TEXT NOT NULL,
-        key TEXT NOT NULL,
-        value TEXT NOT NULL,
-        enabled INTEGER NOT NULL DEFAULT 1
-    )
-    """)
-
-    # Usage table
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS usage (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        business_id TEXT NOT NULL,
-        month TEXT NOT NULL
-    )
-    """)
-
-    db.commit()
-    db.close()
-
-# Initialize DB at startup
 init_db()
 
-# ---------- MODELS ----------
+client = OpenAI()
 
-class CreateBusinessRequest(BaseModel):
-    name: str
+SECRET_KEY = "relixo_ai_saas_startup"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_HOURS = 24
 
-class BusinessDataRequest(BaseModel):
-    business_id: str
-    data: dict
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+# ----------------------
+# MODELS
+# ----------------------
+
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    business_name: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
 
 class ChatRequest(BaseModel):
-    business_id: str
     message: str
 
-# ---------- ONBOARDING ----------
 
-@app.post("/onboard/business")
-def create_business(request: CreateBusinessRequest):
+# ----------------------
+# AUTH HELPERS
+# ----------------------
+
+def hash_password(password):
+    return pwd_context.hash(password)
+
+def verify_password(password, hashed):
+    return pwd_context.verify(password, hashed)
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def get_current_user(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return email
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+
+# ----------------------
+# REGISTER
+# ----------------------
+
+@app.post("/auth/register")
+def register(data: RegisterRequest):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Create business
     business_id = str(uuid.uuid4())
+    cursor.execute("""
+        INSERT INTO businesses (id, name, created_at)
+        VALUES (?, ?, ?)
+    """, (business_id, data.business_name, datetime.utcnow().isoformat()))
 
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(
-        """
-        INSERT INTO businesses (id, name, plan, active, created_at)
-        VALUES (?, ?, 'starter', 1, ?)
-        """,
-        (business_id, request.name, datetime.utcnow().isoformat())
-    )
-    db.commit()
-    db.close()
-
-    return {
-        "business_id": business_id,
-        "name": request.name
-    }
-
-@app.post("/onboard/data")
-def save_business_data(request: BusinessDataRequest):
-    db = get_db()
-    cur = db.cursor()
-
-    for key, entry in request.data.items():
-        cur.execute(
-            """
-            INSERT INTO business_data (business_id, key, value, enabled)
+    # Create user
+    try:
+        cursor.execute("""
+            INSERT INTO users (email, password_hash, business_id, created_at)
             VALUES (?, ?, ?, ?)
-            """,
-            (
-                request.business_id,
-                key,
-                entry.get("value", ""),
-                1 if entry.get("enabled") else 0
-            )
-        )
+        """, (
+            data.email,
+            hash_password(data.password),
+            business_id,
+            datetime.utcnow().isoformat()
+        ))
+    except:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Email already registered")
 
-    db.commit()
-    db.close()
-    return {"status": "saved"}
+    conn.commit()
+    conn.close()
 
-# ---------- HELPERS ----------
+    token = create_access_token({"sub": data.email})
 
-def get_business(business_id):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(
-        "SELECT id, plan, active FROM businesses WHERE id = ?",
-        (business_id,)
-    )
-    row = cur.fetchone()
-    db.close()
-    return row
+    return {"access_token": token}
 
-def get_monthly_usage(business_id):
-    month = datetime.utcnow().strftime("%Y-%m")
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(
-        "SELECT COUNT(*) FROM usage WHERE business_id = ? AND month = ?",
-        (business_id, month)
-    )
-    count = cur.fetchone()[0]
-    db.close()
-    return count
 
-def log_usage(business_id):
-    month = datetime.utcnow().strftime("%Y-%m")
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(
-        "INSERT INTO usage (business_id, month) VALUES (?, ?)",
-        (business_id, month)
-    )
-    db.commit()
-    db.close()
+# ----------------------
+# LOGIN
+# ----------------------
 
-def get_enabled_business_data(business_id):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(
-        """
-        SELECT key, value
-        FROM business_data
-        WHERE business_id = ? AND enabled = 1
-        """,
-        (business_id,)
-    )
-    rows = cur.fetchall()
-    db.close()
-    return rows
+@app.post("/auth/login")
+def login(data: LoginRequest):
+    conn = get_connection()
+    cursor = conn.cursor()
 
-# ---------- CHAT ----------
+    cursor.execute("SELECT * FROM users WHERE email = ?", (data.email,))
+    user = cursor.fetchone()
+
+    conn.close()
+
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid credentials")
+
+    if not verify_password(data.password, user["password_hash"]):
+        raise HTTPException(status_code=400, detail="Invalid credentials")
+
+    token = create_access_token({"sub": data.email})
+    return {"access_token": token}
+
+
+# ----------------------
+# CHAT (PROTECTED)
+# ----------------------
 
 @app.post("/chat")
-def chat(request: ChatRequest):
-    business = get_business(request.business_id)
+def chat(data: ChatRequest, token: str):
+    email = get_current_user(token)
 
-    if not business:
-        return {"reply": "Business not found."}
+    conn = get_connection()
+    cursor = conn.cursor()
 
-    business_id, plan, active = business
+    cursor.execute("SELECT business_id FROM users WHERE email = ?", (email,))
+    result = cursor.fetchone()
 
-    if not active:
-        return {"reply": "This assistant is currently inactive."}
+    if not result:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
 
-    limit = PLANS.get(plan, PLANS["starter"])
-    usage = get_monthly_usage(business_id)
+    business_id = result["business_id"]
 
-    if usage >= limit:
-        return {
-            "reply": "This store has reached its monthly support limit. Please contact support."
-        }
+    cursor.execute("SELECT data FROM businesses WHERE id = ?", (business_id,))
+    business = cursor.fetchone()
 
-    data = get_enabled_business_data(business_id)
+    conn.close()
 
-    if not data:
-        return {
-            "reply": "No business data configured yet. Please contact support."
-        }
+    if not business or not business["data"]:
+        return {"reply": "No business data configured yet."}
 
-    context = "\n".join([f"{k}: {v}" for k, v in data])
+    response = client.responses.create(
+        model="gpt-4o-mini",
+        input=[
+            {"role": "system", "content": business["data"]},
+            {"role": "user", "content": data.message}
+        ]
+    )
 
-    try:
-        response = client.responses.create(
-            model="gpt-4o-mini",
-            input=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a customer support assistant for an online store.\n"
-                        "Only answer using the provided business information.\n"
-                        "If the answer is not available, politely direct the user to human support.\n\n"
-                        f"Business info:\n{context}"
-                    )
-                },
-                {
-                    "role": "user",
-                    "content": request.message
-                }
-            ]
-        )
-
-        reply = response.output_text
-        log_usage(business_id)
-
-        return {"reply": reply}
-
-    except Exception:
-        return {"reply": "Sorry, something went wrong. Please try again later."}
+    return {"reply": response.output_text}
