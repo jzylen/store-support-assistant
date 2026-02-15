@@ -1,3 +1,5 @@
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Security
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from database import init_db, get_connection
@@ -9,6 +11,8 @@ import os
 from openai import OpenAI
 
 app = FastAPI()
+
+security = HTTPBearer()
 
 init_db()
 

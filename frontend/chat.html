@@ -1,14 +1,9 @@
-from fastapi import Header
-
 @app.post("/chat")
 def chat(
     data: ChatRequest,
-    authorization: str = Header(None)
+    credentials: HTTPAuthorizationCredentials = Security(security)
 ):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Missing token")
-
-    token = authorization.split(" ")[1]
+    token = credentials.credentials
     email = get_current_user(token)
 
     conn = get_connection()
