@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Relixo Login</title>
+</head>
+<body>
+  <h2>Login to Relixo</h2>
+
+  <input type="email" id="email" placeholder="Email" /><br><br>
+  <input type="password" id="password" placeholder="Password" /><br><br>
+  <button onclick="login()">Login</button>
+
+  <script>
+    const API_URL = "https://store-support-backend-v2.onrender.com";
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const response = await fetch(API_URL + "/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (data.access_token) {
+        localStorage.setItem("access_token", data.access_token);
+        window.location.href = "chat.html";
+      } else {
+        alert("Login failed");
+      }
+    }
+  </script>
+</body>
+</html>

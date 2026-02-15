@@ -1,37 +1,93 @@
-@app.post("/chat")
-def chat(
-    data: ChatRequest,
-    credentials: HTTPAuthorizationCredentials = Security(security)
-):
-    token = credentials.credentials
-    email = get_current_user(token)
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Relixo Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+    }
 
-    conn = get_connection()
-    cursor = conn.cursor()
+    #chatBox {
+      border: 1px solid #ccc;
+      padding: 15px;
+      height: 400px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
 
-    cursor.execute("SELECT business_id FROM users WHERE email = ?", (email,))
-    result = cursor.fetchone()
+    .message {
+      margin-bottom: 10px;
+    }
 
-    if not result:
-        conn.close()
-        raise HTTPException(status_code=404, detail="User not found")
+    .user {
+      font-weight: bold;
+    }
 
-    business_id = result["business_id"]
+    .ai {
+      color: green;
+    }
+  </style>
+</head>
+<body>
 
-    cursor.execute("SELECT data FROM businesses WHERE id = ?", (business_id,))
-    business = cursor.fetchone()
+  <h2>Relixo Chat</h2>
 
-    conn.close()
+  <div id="chatBox"></div>
 
-    if not business or not business["data"]:
-        return {"reply": "No business data configured yet."}
+  <input type="text" id="messageInput" placeholder="Type message..." style="width: 80%;" />
+  <button onclick="sendMessage()">Send</button>
 
-    response = client.responses.create(
-        model="gpt-4o-mini",
-        input=[
-            {"role": "system", "content": business["data"]},
-            {"role": "user", "content": data.message}
-        ]
-    )
+  <script>
+    const API_URL = "https://store-support-backend-v2.onrender.com";
 
-    return {"reply": response.output_text}
+    // 🔒 Protect page
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      window.location.href = "login.html";
+    }
+
+    async function sendMessage() {
+      const messageInput = document.getElementById("messageInput");
+      const message = messageInput.value;
+
+      if (!message) return;
+
+      const chatBox = document.getElementById("chatBox");
+
+      chatBox.innerHTML += `
+        <div class="message user">You: ${message}</div>
+      `;
+
+      messageInput.value = "";
+
+      try {
+        const response = await fetch(API_URL + "/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({ message: message })
+        });
+
+        const data = await response.json();
+
+        chatBox.innerHTML += `
+          <div class="message ai">AI: ${data.reply}</div>
+        `;
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+      } catch (error) {
+        chatBox.innerHTML += `
+          <div class="message ai">Error connecting to server.</div>
+        `;
+      }
+    }
+  </script>
+
+</body>
+</html>
