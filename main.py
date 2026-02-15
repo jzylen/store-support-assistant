@@ -74,15 +74,16 @@ def register(data: RegisterRequest):
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Create business
     business_id = str(uuid.uuid4())
-    cursor.execute("""
-        INSERT INTO businesses (id, name, created_at)
-        VALUES (?, ?, ?)
-    """, (business_id, data.business_name, datetime.utcnow().isoformat()))
 
-    # Create user
     try:
+        # Create business
+        cursor.execute("""
+            INSERT INTO businesses (id, name, created_at)
+            VALUES (?, ?, ?)
+        """, (business_id, data.business_name, datetime.utcnow().isoformat()))
+
+        # Create user
         cursor.execute("""
             INSERT INTO users (email, password_hash, business_id, created_at)
             VALUES (?, ?, ?, ?)
@@ -92,15 +93,16 @@ def register(data: RegisterRequest):
             business_id,
             datetime.utcnow().isoformat()
         ))
-    except:
-        conn.close()
-        raise HTTPException(status_code=400, detail="Email already registered")
 
-    conn.commit()
+        conn.commit()
+
+    except Exception as e:
+        conn.close()
+        raise HTTPException(status_code=400, detail=str(e))
+
     conn.close()
 
     token = create_access_token({"sub": data.email})
-
     return {"access_token": token}
 
 
