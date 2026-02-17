@@ -8,7 +8,6 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from openai import OpenAI
 import uuid
-import os
 
 # -----------------------
 # APP SETUP
@@ -18,7 +17,6 @@ app = FastAPI(title="Relixo API", version="1.0.0")
 
 security = HTTPBearer()
 
-# ✅ CORS (replace with your real frontend URL)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -41,6 +39,16 @@ pwd_context = CryptContext(
     schemes=["argon2"],
     deprecated="auto"
 )
+
+# -----------------------
+# PLAN LIMITS
+# -----------------------
+
+PLAN_LIMITS = {
+    "starter": 1000,
+    "growth": 5000,
+    "pro": 15000
+}
 
 # -----------------------
 # MODELS
@@ -102,9 +110,15 @@ def register(data: RegisterRequest):
 
     try:
         cursor.execute("""
-            INSERT INTO businesses (id, name, created_at)
-            VALUES (?, ?, ?)
-        """, (business_id, data.business_name, datetime.utcnow().isoformat()))
+            INSERT INTO businesses (id, name, created_at, plan, message_count)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            business_id,
+            data.business_name,
+            datetime.utcnow().isoformat(),
+            "starter",
+            0
+        ))
 
         cursor.execute("""
             INSERT INTO users (email, password_hash, business_id, created_at)
@@ -153,7 +167,7 @@ def login(data: LoginRequest):
 
 
 # -----------------------
-# BUSINESS SETUP (PROTECTED)
+# BUSINESS SETUP
 # -----------------------
 
 @app.post("/business/setup")
@@ -189,7 +203,7 @@ def setup_business(
 
 
 # -----------------------
-# CHAT (PROTECTED)
+# CHAT (WITH LIMIT ENFORCEMENT)
 # -----------------------
 
 @app.post("/chat")
@@ -203,29 +217,51 @@ def chat(
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT business_id FROM users WHERE email = ?", (email,))
+    cursor.execute("""
+        SELECT b.id, b.data, b.plan, b.message_count
+        FROM users u
+        JOIN businesses b ON u.business_id = b.id
+        WHERE u.email = ?
+    """, (email,))
+    
     result = cursor.fetchone()
 
     if not result:
         conn.close()
         raise HTTPException(status_code=404, detail="User not found")
 
-    business_id = result["business_id"]
+    business_id = result["id"]
+    business_data = result["data"]
+    plan = result["plan"]
+    message_count = result["message_count"]
 
-    cursor.execute("SELECT data FROM businesses WHERE id = ?", (business_id,))
-    business = cursor.fetchone()
+    limit = PLAN_LIMITS.get(plan, 1000)
 
-    conn.close()
+    if message_count >= limit:
+        conn.close()
+        return {
+            "reply": f"You have reached your {plan} plan limit of {limit} messages this month."
+        }
 
-    if not business or not business["data"]:
+    if not business_data:
+        conn.close()
         return {"reply": "No business data configured yet."}
 
     response = client.responses.create(
         model="gpt-4o-mini",
         input=[
-            {"role": "system", "content": business["data"]},
+            {"role": "system", "content": business_data},
             {"role": "user", "content": data.message}
         ]
     )
+
+    # increment usage
+    cursor.execute("""
+        UPDATE businesses
+        SET message_count = message_count + 1
+        WHERE id = ?
+    """, (business_id,))
+    conn.commit()
+    conn.close()
 
     return {"reply": response.output_text}
