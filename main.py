@@ -10,8 +10,15 @@ from openai import OpenAI
 import uuid
 import os
 
+# -----------------------
+# APP SETUP
+# -----------------------
+
 app = FastAPI(title="Relixo API", version="1.0.0")
 
+security = HTTPBearer()
+
+# ✅ CORS (replace with your real frontend URL)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -21,8 +28,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-security = HTTPBearer()
 
 init_db()
 
@@ -52,6 +57,9 @@ class LoginRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str
+
+class BusinessSetupRequest(BaseModel):
+    data: str
 
 
 # -----------------------
@@ -142,6 +150,42 @@ def login(data: LoginRequest):
 
     token = create_access_token({"sub": data.email})
     return {"access_token": token}
+
+
+# -----------------------
+# BUSINESS SETUP (PROTECTED)
+# -----------------------
+
+@app.post("/business/setup")
+def setup_business(
+    request: BusinessSetupRequest,
+    credentials: HTTPAuthorizationCredentials = Security(security)
+):
+    token = credentials.credentials
+    email = get_current_user(token)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT business_id FROM users WHERE email = ?", (email,))
+    result = cursor.fetchone()
+
+    if not result:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
+
+    business_id = result["business_id"]
+
+    cursor.execute("""
+        UPDATE businesses
+        SET data = ?
+        WHERE id = ?
+    """, (request.data, business_id))
+
+    conn.commit()
+    conn.close()
+
+    return {"message": "Business data saved successfully"}
 
 
 # -----------------------
