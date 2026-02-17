@@ -12,9 +12,11 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Businesses table
+    cursor.execute("DROP TABLE IF EXISTS users")
+    cursor.execute("DROP TABLE IF EXISTS businesses")
+
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS businesses (
+        CREATE TABLE businesses (
             id TEXT PRIMARY KEY,
             name TEXT,
             data TEXT,
@@ -24,15 +26,13 @@ def init_db():
         )
     """)
 
-    # Users table
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
             business_id TEXT NOT NULL,
-            created_at TEXT,
-            FOREIGN KEY (business_id) REFERENCES businesses (id)
+            created_at TEXT
         )
     """)
 
