@@ -2,32 +2,27 @@ from fastapi import FastAPI, HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from database import init_db, get_connection
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from openai import OpenAI
+import sqlite3
 import uuid
 
-# -----------------------
+# =========================
 # APP SETUP
-# -----------------------
+# =========================
 
 app = FastAPI(title="Relixo API", version="1.0.0")
-
 security = HTTPBearer()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://store-support-frontend.onrender.com"
-    ],
+    allow_origins=["*"],  # safe for development stage
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-init_db()
 
 client = OpenAI()
 
@@ -40,9 +35,7 @@ pwd_context = CryptContext(
     deprecated="auto"
 )
 
-# -----------------------
-# PLAN LIMITS
-# -----------------------
+DB_NAME = "data.db"
 
 PLAN_LIMITS = {
     "starter": 1000,
@@ -50,9 +43,52 @@ PLAN_LIMITS = {
     "pro": 15000
 }
 
-# -----------------------
+# =========================
+# DATABASE INIT (SAFE RESET)
+# =========================
+
+def get_connection():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Drop tables once to ensure correct schema
+    cursor.execute("DROP TABLE IF EXISTS users")
+    cursor.execute("DROP TABLE IF EXISTS businesses")
+
+    cursor.execute("""
+        CREATE TABLE businesses (
+            id TEXT PRIMARY KEY,
+            name TEXT,
+            data TEXT,
+            plan TEXT DEFAULT 'starter',
+            message_count INTEGER DEFAULT 0,
+            created_at TEXT
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            business_id TEXT NOT NULL,
+            created_at TEXT
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+init_db()
+
+# =========================
 # MODELS
-# -----------------------
+# =========================
 
 class RegisterRequest(BaseModel):
     email: str
@@ -69,10 +105,9 @@ class ChatRequest(BaseModel):
 class BusinessSetupRequest(BaseModel):
     data: str
 
-
-# -----------------------
+# =========================
 # AUTH HELPERS
-# -----------------------
+# =========================
 
 def hash_password(password):
     return pwd_context.hash(password)
@@ -96,10 +131,9 @@ def get_current_user(token: str):
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-
-# -----------------------
-# REGISTER
-# -----------------------
+# =========================
+# AUTH ROUTES
+# =========================
 
 @app.post("/auth/register")
 def register(data: RegisterRequest):
@@ -131,20 +165,13 @@ def register(data: RegisterRequest):
         ))
 
         conn.commit()
-
     except Exception as e:
         conn.close()
         raise HTTPException(status_code=400, detail=str(e))
 
     conn.close()
-
     token = create_access_token({"sub": data.email})
     return {"access_token": token}
-
-
-# -----------------------
-# LOGIN
-# -----------------------
 
 @app.post("/auth/login")
 def login(data: LoginRequest):
@@ -165,10 +192,9 @@ def login(data: LoginRequest):
     token = create_access_token({"sub": data.email})
     return {"access_token": token}
 
-
-# -----------------------
+# =========================
 # BUSINESS SETUP
-# -----------------------
+# =========================
 
 @app.post("/business/setup")
 def setup_business(
@@ -181,7 +207,9 @@ def setup_business(
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT business_id FROM users WHERE email = ?", (email,))
+    cursor.execute("""
+        SELECT business_id FROM users WHERE email = ?
+    """, (email,))
     result = cursor.fetchone()
 
     if not result:
@@ -201,10 +229,42 @@ def setup_business(
 
     return {"message": "Business data saved successfully"}
 
+# =========================
+# USAGE ENDPOINT
+# =========================
 
-# -----------------------
-# CHAT (WITH LIMIT ENFORCEMENT)
-# -----------------------
+@app.get("/business/usage")
+def get_usage(
+    credentials: HTTPAuthorizationCredentials = Security(security)
+):
+    token = credentials.credentials
+    email = get_current_user(token)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT b.plan, b.message_count
+        FROM users u
+        JOIN businesses b ON u.business_id = b.id
+        WHERE u.email = ?
+    """, (email,))
+    
+    result = cursor.fetchone()
+    conn.close()
+
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {
+        "plan": result["plan"],
+        "message_count": result["message_count"],
+        "limit": PLAN_LIMITS.get(result["plan"], 1000)
+    }
+
+# =========================
+# CHAT WITH LIMIT
+# =========================
 
 @app.post("/chat")
 def chat(
@@ -255,7 +315,6 @@ def chat(
         ]
     )
 
-    # increment usage
     cursor.execute("""
         UPDATE businesses
         SET message_count = message_count + 1
