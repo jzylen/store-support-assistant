@@ -56,10 +56,6 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Drop tables once to ensure correct schema
-    cursor.execute("DROP TABLE IF EXISTS users")
-    cursor.execute("DROP TABLE IF EXISTS businesses")
-
     cursor.execute("""
         CREATE TABLE businesses (
             id TEXT PRIMARY KEY,

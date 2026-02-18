@@ -1,5 +1,4 @@
 import sqlite3
-from datetime import datetime
 
 DB_NAME = "data.db"
 
@@ -12,11 +11,8 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("DROP TABLE IF EXISTS users")
-    cursor.execute("DROP TABLE IF EXISTS businesses")
-
     cursor.execute("""
-        CREATE TABLE businesses (
+        CREATE TABLE IF NOT EXISTS businesses (
             id TEXT PRIMARY KEY,
             name TEXT,
             data TEXT,
@@ -27,7 +23,7 @@ def init_db():
     """)
 
     cursor.execute("""
-        CREATE TABLE users (
+        CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
