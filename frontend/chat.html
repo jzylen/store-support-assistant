@@ -62,6 +62,11 @@
       border-bottom-right-radius: 4px;
     }
 
+    .typing {
+      font-style: italic;
+      opacity: 0.7;
+    }
+
     .input-area {
       display: flex;
       border-top: 1px solid #e5e7eb;
@@ -84,7 +89,12 @@
       font-weight: 500;
     }
 
-    button:hover {
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    button:hover:not(:disabled) {
       background: #1e40af;
     }
   </style>
@@ -96,12 +106,11 @@
     Relixo Assistant
   </div>
 
-  <div class="messages" id="messages">
-  </div>
+  <div class="messages" id="messages"></div>
 
   <div class="input-area">
     <input type="text" id="userInput" placeholder="Type your message..." />
-    <button onclick="sendMessage()">Send</button>
+    <button id="sendBtn" onclick="sendMessage()">Send</button>
   </div>
 </div>
 
@@ -110,39 +119,62 @@
   const token = localStorage.getItem("access_token");
 
   const messagesDiv = document.getElementById("messages");
+  const input = document.getElementById("userInput");
+  const sendBtn = document.getElementById("sendBtn");
 
-  function addMessage(text, sender) {
+  if (!token) {
+    window.location.href = "index.html";
+  }
+
+  function addMessage(text, sender, isTyping = false) {
     const msg = document.createElement("div");
     msg.classList.add("message", sender);
+    if (isTyping) msg.classList.add("typing");
     msg.innerText = text;
     messagesDiv.appendChild(msg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    return msg;
   }
 
-  // Welcome message (does NOT use API)
   addMessage("Hi 👋 Welcome! How can I assist you today?", "bot");
 
   async function sendMessage() {
-    const input = document.getElementById("userInput");
     const text = input.value.trim();
-
     if (!text) return;
 
     addMessage(text, "user");
     input.value = "";
+    sendBtn.disabled = true;
 
-    const response = await fetch(API_URL + "/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-      body: JSON.stringify({ message: text })
-    });
+    const typingIndicator = addMessage("Typing...", "bot", true);
 
-    const data = await response.json();
-    addMessage(data.reply, "bot");
+    try {
+      const response = await fetch(API_URL + "/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ message: text })
+      });
+
+      const data = await response.json();
+      typingIndicator.remove();
+      addMessage(data.reply, "bot");
+
+    } catch (error) {
+      typingIndicator.remove();
+      addMessage("Something went wrong. Please try again.", "bot");
+    }
+
+    sendBtn.disabled = false;
   }
+
+  input.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  });
 </script>
 
 </body>
