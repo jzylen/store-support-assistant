@@ -6,19 +6,19 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from openai import OpenAI
-import sqlite3
+from database import get_connection, init_db
 import uuid
 
 # =========================
 # APP SETUP
 # =========================
 
-app = FastAPI(title="Relixo API", version="1.0.0")
+app = FastAPI(title="Relixo API", version="2.0.0")
 security = HTTPBearer()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # safe for development stage
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,50 +35,11 @@ pwd_context = CryptContext(
     deprecated="auto"
 )
 
-DB_NAME = "data.db"
-
 PLAN_LIMITS = {
     "starter": 1000,
     "growth": 5000,
     "pro": 15000
 }
-
-# =========================
-# DATABASE INIT (SAFE RESET)
-# =========================
-
-def get_connection():
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def init_db():
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        CREATE TABLE businesses (
-            id TEXT PRIMARY KEY,
-            name TEXT,
-            data TEXT,
-            plan TEXT DEFAULT 'starter',
-            message_count INTEGER DEFAULT 0,
-            created_at TEXT
-        )
-    """)
-
-    cursor.execute("""
-        CREATE TABLE users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
-            business_id TEXT NOT NULL,
-            created_at TEXT
-        )
-    """)
-
-    conn.commit()
-    conn.close()
 
 init_db()
 
@@ -141,7 +102,7 @@ def register(data: RegisterRequest):
     try:
         cursor.execute("""
             INSERT INTO businesses (id, name, created_at, plan, message_count)
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s)
         """, (
             business_id,
             data.business_name,
@@ -152,7 +113,7 @@ def register(data: RegisterRequest):
 
         cursor.execute("""
             INSERT INTO users (email, password_hash, business_id, created_at)
-            VALUES (?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s)
         """, (
             data.email,
             hash_password(data.password),
@@ -162,6 +123,7 @@ def register(data: RegisterRequest):
 
         conn.commit()
     except Exception as e:
+        conn.rollback()
         conn.close()
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -174,7 +136,7 @@ def login(data: LoginRequest):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM users WHERE email = ?", (data.email,))
+    cursor.execute("SELECT * FROM users WHERE email = %s", (data.email,))
     user = cursor.fetchone()
 
     conn.close()
@@ -203,9 +165,10 @@ def setup_business(
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT business_id FROM users WHERE email = ?
-    """, (email,))
+    cursor.execute(
+        "SELECT business_id FROM users WHERE email = %s",
+        (email,)
+    )
     result = cursor.fetchone()
 
     if not result:
@@ -216,8 +179,8 @@ def setup_business(
 
     cursor.execute("""
         UPDATE businesses
-        SET data = ?
-        WHERE id = ?
+        SET data = %s
+        WHERE id = %s
     """, (request.data, business_id))
 
     conn.commit()
@@ -243,7 +206,7 @@ def get_usage(
         SELECT b.plan, b.message_count
         FROM users u
         JOIN businesses b ON u.business_id = b.id
-        WHERE u.email = ?
+        WHERE u.email = %s
     """, (email,))
     
     result = cursor.fetchone()
@@ -277,7 +240,7 @@ def chat(
         SELECT b.id, b.data, b.plan, b.message_count
         FROM users u
         JOIN businesses b ON u.business_id = b.id
-        WHERE u.email = ?
+        WHERE u.email = %s
     """, (email,))
     
     result = cursor.fetchone()
@@ -314,8 +277,9 @@ def chat(
     cursor.execute("""
         UPDATE businesses
         SET message_count = message_count + 1
-        WHERE id = ?
+        WHERE id = %s
     """, (business_id,))
+
     conn.commit()
     conn.close()
 

@@ -1,11 +1,11 @@
-import sqlite3
+import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
-DB_NAME = "data.db"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 def get_connection():
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
-    return conn
+    return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
 
 def init_db():
     conn = get_connection()
@@ -19,18 +19,19 @@ def init_db():
             plan TEXT DEFAULT 'starter',
             message_count INTEGER DEFAULT 0,
             created_at TEXT
-        )
+        );
     """)
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
             business_id TEXT NOT NULL,
             created_at TEXT
-        )
+        );
     """)
 
     conn.commit()
+    cursor.close()
     conn.close()
