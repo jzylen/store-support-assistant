@@ -14,8 +14,14 @@ import uuid
 # =========================
 
 app = FastAPI(title="Relixo API", version="2.0.0")
+
 security = HTTPBearer()
 
+@app.on_event("startup")
+def startup_event():
+    init_db()
+
+    
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -41,7 +47,6 @@ PLAN_LIMITS = {
     "pro": 15000
 }
 
-init_db()
 
 # =========================
 # MODELS
