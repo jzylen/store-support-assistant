@@ -1,174 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Pricing – Store Support Assistant</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <title>Relixo Pricing</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f6f6f6;
-      color: #111;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f4f7fb;
+      padding: 60px 20px;
     }
 
-    header {
+    h1 {
       text-align: center;
-      padding: 60px 20px 30px;
+      margin-bottom: 40px;
     }
 
-    header h1 {
-      font-size: 36px;
-      margin-bottom: 15px;
-    }
-
-    header p {
-      font-size: 18px;
-      color: #555;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .pricing-container {
-      max-width: 1100px;
-      margin: 40px auto 80px;
+    .pricing-grid {
+      max-width: 1000px;
+      margin: auto;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 30px;
-      padding: 0 20px;
     }
 
-    .card {
+    .plan {
       background: white;
-      border-radius: 14px;
       padding: 30px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .card h2 {
-      margin-top: 0;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      text-align: center;
     }
 
     .price {
-      font-size: 34px;
+      font-size: 32px;
       font-weight: bold;
-      margin: 15px 0;
-    }
-
-    .price span {
-      font-size: 16px;
-      font-weight: normal;
-      color: #555;
+      margin: 20px 0;
     }
 
     ul {
-      padding-left: 18px;
-      line-height: 1.6;
-      font-size: 14px;
-      flex-grow: 1;
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+
+    li {
+      margin: 10px 0;
     }
 
     button {
-      margin-top: 20px;
-      padding: 12px;
-      font-size: 15px;
-      background: #111;
+      background: #2563eb;
       color: white;
       border: none;
-      border-radius: 6px;
+      padding: 12px 20px;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: 600;
+      margin-top: 15px;
     }
 
-    .recommended {
-      border: 2px solid #111;
+    button:hover {
+      background: #1e40af;
     }
 
-    footer {
-      text-align: center;
-      padding: 40px;
-      font-size: 14px;
-      color: #777;
+    .trial {
+      color: #16a34a;
+      font-weight: 500;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Simple pricing that scales with your support volume</h1>
-  <p>
-    Reduce repetitive customer service tickets and automate shipping,
-    returns, and order questions — without hiring more staff.
-  </p>
-</header>
+<h1>Choose Your Plan</h1>
 
-<section class="pricing-container">
+<div class="pricing-grid">
 
-  <!-- STARTER -->
-  <div class="card">
+  <div class="plan">
     <h2>Starter</h2>
-    <div class="price">$29 <span>/ month</span></div>
-
+    <div class="price">$19 / month</div>
+    <div class="trial">7-day free trial</div>
     <ul>
-      <li>Up to 1,000 messages / month</li>
-      <li>Shipping & returns automation</li>
-      <li>Order tracking explanations</li>
-      <li>Email fallback for complex issues</li>
+      <li>1,000 messages</li>
+      <li>AI customer support</li>
+      <li>Email support</li>
     </ul>
-
-    <button onclick="startPlan('starter')">
-      Start Starter Plan
-    </button>
+    <button onclick="selectPlan('starter')">Start Trial</button>
   </div>
 
-  <!-- GROWTH -->
-  <div class="card recommended">
+  <div class="plan">
     <h2>Growth</h2>
-    <div class="price">$79 <span>/ month</span></div>
-
+    <div class="price">$49 / month</div>
+    <div class="trial">7-day free trial</div>
     <ul>
-      <li>Up to 5,000 messages / month</li>
-      <li>Priority AI responses</li>
-      <li>Custom welcome message</li>
-      <li>Advanced guardrails</li>
+      <li>5,000 messages</li>
+      <li>Priority AI processing</li>
+      <li>Email support</li>
     </ul>
-
-    <button onclick="startPlan('growth')">
-      Start Growth Plan
-    </button>
+    <button onclick="selectPlan('growth')">Start Trial</button>
   </div>
 
-  <!-- PRO -->
-  <div class="card">
+  <div class="plan">
     <h2>Pro</h2>
-    <div class="price">$149 <span>/ month</span></div>
-
+    <div class="price">$99 / month</div>
+    <div class="trial">7-day free trial</div>
     <ul>
-      <li>Up to 15,000 messages / month</li>
-      <li>Multi-site support</li>
-      <li>Usage analytics (coming soon)</li>
-      <li>Early access to integrations</li>
+      <li>15,000 messages</li>
+      <li>High-priority processing</li>
+      <li>Priority support</li>
     </ul>
-
-    <button onclick="startPlan('pro')">
-      Start Pro Plan
-    </button>
+    <button onclick="selectPlan('pro')">Start Trial</button>
   </div>
 
-</section>
-
-<footer>
-  Cancel anytime. Upgrade as your store grows.
-</footer>
+</div>
 
 <script>
-  function startPlan(plan) {
-    // For now, redirect to onboarding.
-    // Payment integration comes later.
-    localStorage.setItem("selected_plan", plan);
-    window.location.href = "create.html";
+  const API_URL = "https://store-support-backend-v2.onrender.com";
+  const token = localStorage.getItem("access_token");
+
+  function selectPlan(plan) {
+    if (!token) {
+      alert("Please login first.");
+      window.location.href = "index.html";
+      return;
+    }
+
+    // For now, just log selection.
+    // Paddle checkout will replace this.
+    alert("Plan selected: " + plan + ". Payment integration coming next.");
   }
 </script>
 
