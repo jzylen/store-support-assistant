@@ -33,6 +33,7 @@ client = OpenAI()
 SECRET_KEY = "relixo_super_secret_key_123456789"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
+TRIAL_DAYS = 7
 
 pwd_context = CryptContext(
     schemes=["argon2"],
@@ -44,8 +45,6 @@ PLAN_LIMITS = {
     "growth": 5000,
     "pro": 15000
 }
-
-TRIAL_DAYS = 7
 
 # =========================
 # MODELS
@@ -158,7 +157,45 @@ def login(data: LoginRequest):
     return {"access_token": token}
 
 # =========================
-# BUSINESS USAGE
+# BUSINESS SETUP
+# =========================
+
+@app.post("/business/setup")
+def setup_business(
+    request: BusinessSetupRequest,
+    credentials: HTTPAuthorizationCredentials = Security(security)
+):
+    token = credentials.credentials
+    email = get_current_user(token)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT business_id FROM users WHERE email = %s",
+        (email,)
+    )
+    result = cursor.fetchone()
+
+    if not result:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
+
+    business_id = result["business_id"]
+
+    cursor.execute("""
+        UPDATE businesses
+        SET data = %s
+        WHERE id = %s
+    """, (request.data, business_id))
+
+    conn.commit()
+    conn.close()
+
+    return {"message": "Business data saved successfully"}
+
+# =========================
+# USAGE ENDPOINT
 # =========================
 
 @app.get("/business/usage")
@@ -191,7 +228,7 @@ def get_usage(credentials: HTTPAuthorizationCredentials = Security(security)):
     }
 
 # =========================
-# CHAT WITH TRIAL ENFORCEMENT
+# CHAT WITH TRIAL + LIMIT ENFORCEMENT
 # =========================
 
 @app.post("/chat")
@@ -223,10 +260,7 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
     subscription_status = result["subscription_status"]
     trial_ends_at = result["trial_ends_at"]
 
-    # =====================
-    # TRIAL / SUBSCRIPTION CHECK
-    # =====================
-
+    # Trial enforcement
     if subscription_status == "trialing":
         if datetime.utcnow() > trial_ends_at:
             cursor.execute("""
@@ -242,10 +276,7 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
         conn.close()
         return {"reply": "Subscription inactive. Please upgrade to continue."}
 
-    # =====================
-    # MESSAGE LIMIT CHECK
-    # =====================
-
+    # Message limit enforcement
     limit = PLAN_LIMITS.get(plan, 1000)
 
     if message_count >= limit:
@@ -256,10 +287,7 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
         conn.close()
         return {"reply": "No business data configured yet."}
 
-    # =====================
-    # AI RESPONSE
-    # =====================
-
+    # AI response
     response = client.responses.create(
         model="gpt-4o-mini",
         input=[
