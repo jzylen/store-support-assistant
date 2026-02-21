@@ -2,15 +2,11 @@
 <html>
 <head>
   <title>Relixo Dashboard</title>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-
   <style>
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f5f6fa;
+      background-color: #f4f7fb;
     }
 
     .container {
@@ -19,153 +15,110 @@
       padding: 20px;
     }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 40px;
-    }
-
     h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-
-    .logout {
-      cursor: pointer;
-      color: #ff4d4f;
+      margin-bottom: 30px;
     }
 
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 20px;
     }
 
     .card {
       background: white;
-      padding: 30px;
+      padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    .card h3 {
-      margin: 0 0 10px 0;
-      color: #888;
-      font-weight: 500;
-    }
-
-    .card p {
-      font-size: 26px;
-      margin: 0;
-      font-weight: bold;
-    }
-
-    .progress-container {
+    .upgrade-box {
       margin-top: 40px;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    .progress-bar {
-      width: 100%;
-      height: 20px;
-      background: #e5e7eb;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: #6366f1;
-      width: 0%;
-      transition: width 0.5s ease;
-    }
-
-    .chat-link {
-      margin-top: 30px;
-      display: inline-block;
-      text-decoration: none;
-      background: #6366f1;
+    button {
+      background: #2563eb;
       color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1e40af;
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="header">
-    <h1>Relixo Dashboard</h1>
-    <div class="logout" onclick="logout()">Logout</div>
-  </div>
+  <h1>Relixo Dashboard</h1>
 
   <div class="card-grid">
     <div class="card">
-      <h3>Current Plan</h3>
-      <p id="plan">Loading...</p>
+      <h3>Plan</h3>
+      <p id="plan"></p>
     </div>
 
     <div class="card">
       <h3>Messages Used</h3>
-      <p id="used">0</p>
+      <p id="used"></p>
     </div>
 
     <div class="card">
-      <h3>Monthly Limit</h3>
-      <p id="limit">0</p>
+      <h3>Limit</h3>
+      <p id="limit"></p>
+    </div>
+
+    <div class="card">
+      <h3>Status</h3>
+      <p id="status"></p>
     </div>
   </div>
 
-  <div class="progress-container">
-    <h3>Usage</h3>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
+  <div class="upgrade-box">
+    <h3>Upgrade Your Plan</h3>
+    <p id="trialInfo"></p>
+    <button onclick="goToPricing()">Upgrade Plan</button>
   </div>
-
-  <a href="chat.html" class="chat-link">Go to Chat</a>
 </div>
 
 <script>
   const API_URL = "https://store-support-backend-v2.onrender.com";
   const token = localStorage.getItem("access_token");
 
-  if (!token) {
-    window.location.href = "index.html";
-  }
-
   async function loadUsage() {
-    const response = await fetch(API_URL + "/business/usage", {
-      method: "GET",
+    const res = await fetch(API_URL + "/business/usage", {
       headers: {
         "Authorization": "Bearer " + token
       }
     });
 
-    const data = await response.json();
+    const data = await res.json();
 
     document.getElementById("plan").innerText = data.plan;
     document.getElementById("used").innerText = data.message_count;
     document.getElementById("limit").innerText = data.limit;
+    document.getElementById("status").innerText = data.subscription_status;
 
-    const percent = (data.message_count / data.limit) * 100;
-    document.getElementById("progressFill").style.width = percent + "%";
-  }
-
-  function logout() {
-    localStorage.removeItem("access_token");
-    window.location.href = "index.html";
-  }
-
-  // Load on initial open
-  loadUsage();
-
-  // Reload when tab becomes active again
-  document.addEventListener("visibilitychange", function() {
-    if (!document.hidden) {
-      loadUsage();
+    if (data.subscription_status === "trialing") {
+      document.getElementById("trialInfo").innerText =
+        "Your trial ends on: " + data.trial_ends_at;
+    } else {
+      document.getElementById("trialInfo").innerText = "";
     }
-  });
+  }
+
+  function goToPricing() {
+    window.location.href = "pricing.html";
+  }
+
+  loadUsage();
 </script>
 
 </body>
