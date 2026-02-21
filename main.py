@@ -13,15 +13,13 @@ import uuid
 # APP SETUP
 # =========================
 
-app = FastAPI(title="Relixo API", version="2.0.0")
-
+app = FastAPI(title="Relixo API", version="3.0.0")
 security = HTTPBearer()
 
 @app.on_event("startup")
 def startup_event():
     init_db()
 
-    
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -47,6 +45,7 @@ PLAN_LIMITS = {
     "pro": 15000
 }
 
+TRIAL_DAYS = 7
 
 # =========================
 # MODELS
@@ -103,17 +102,21 @@ def register(data: RegisterRequest):
     cursor = conn.cursor()
 
     business_id = str(uuid.uuid4())
+    trial_end = datetime.utcnow() + timedelta(days=TRIAL_DAYS)
 
     try:
         cursor.execute("""
-            INSERT INTO businesses (id, name, created_at, plan, message_count)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO businesses 
+            (id, name, created_at, plan, message_count, subscription_status, trial_ends_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """, (
             business_id,
             data.business_name,
             datetime.utcnow().isoformat(),
             "starter",
-            0
+            0,
+            "trialing",
+            trial_end
         ))
 
         cursor.execute("""
@@ -143,7 +146,6 @@ def login(data: LoginRequest):
 
     cursor.execute("SELECT * FROM users WHERE email = %s", (data.email,))
     user = cursor.fetchone()
-
     conn.close()
 
     if not user:
@@ -156,51 +158,11 @@ def login(data: LoginRequest):
     return {"access_token": token}
 
 # =========================
-# BUSINESS SETUP
-# =========================
-
-@app.post("/business/setup")
-def setup_business(
-    request: BusinessSetupRequest,
-    credentials: HTTPAuthorizationCredentials = Security(security)
-):
-    token = credentials.credentials
-    email = get_current_user(token)
-
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT business_id FROM users WHERE email = %s",
-        (email,)
-    )
-    result = cursor.fetchone()
-
-    if not result:
-        conn.close()
-        raise HTTPException(status_code=404, detail="User not found")
-
-    business_id = result["business_id"]
-
-    cursor.execute("""
-        UPDATE businesses
-        SET data = %s
-        WHERE id = %s
-    """, (request.data, business_id))
-
-    conn.commit()
-    conn.close()
-
-    return {"message": "Business data saved successfully"}
-
-# =========================
-# USAGE ENDPOINT
+# BUSINESS USAGE
 # =========================
 
 @app.get("/business/usage")
-def get_usage(
-    credentials: HTTPAuthorizationCredentials = Security(security)
-):
+def get_usage(credentials: HTTPAuthorizationCredentials = Security(security)):
     token = credentials.credentials
     email = get_current_user(token)
 
@@ -208,7 +170,7 @@ def get_usage(
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT b.plan, b.message_count
+        SELECT b.plan, b.message_count, b.subscription_status, b.trial_ends_at
         FROM users u
         JOIN businesses b ON u.business_id = b.id
         WHERE u.email = %s
@@ -223,18 +185,17 @@ def get_usage(
     return {
         "plan": result["plan"],
         "message_count": result["message_count"],
-        "limit": PLAN_LIMITS.get(result["plan"], 1000)
+        "limit": PLAN_LIMITS.get(result["plan"], 1000),
+        "subscription_status": result["subscription_status"],
+        "trial_ends_at": result["trial_ends_at"]
     }
 
 # =========================
-# CHAT WITH LIMIT
+# CHAT WITH TRIAL ENFORCEMENT
 # =========================
 
 @app.post("/chat")
-def chat(
-    data: ChatRequest,
-    credentials: HTTPAuthorizationCredentials = Security(security)
-):
+def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security(security)):
     token = credentials.credentials
     email = get_current_user(token)
 
@@ -242,7 +203,8 @@ def chat(
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT b.id, b.data, b.plan, b.message_count
+        SELECT b.id, b.data, b.plan, b.message_count,
+               b.subscription_status, b.trial_ends_at
         FROM users u
         JOIN businesses b ON u.business_id = b.id
         WHERE u.email = %s
@@ -258,18 +220,45 @@ def chat(
     business_data = result["data"]
     plan = result["plan"]
     message_count = result["message_count"]
+    subscription_status = result["subscription_status"]
+    trial_ends_at = result["trial_ends_at"]
+
+    # =====================
+    # TRIAL / SUBSCRIPTION CHECK
+    # =====================
+
+    if subscription_status == "trialing":
+        if datetime.utcnow() > trial_ends_at:
+            cursor.execute("""
+                UPDATE businesses
+                SET subscription_status = 'expired'
+                WHERE id = %s
+            """, (business_id,))
+            conn.commit()
+            conn.close()
+            return {"reply": "Your free trial has expired. Please upgrade to continue using Relixo."}
+
+    elif subscription_status not in ["active", "trialing"]:
+        conn.close()
+        return {"reply": "Subscription inactive. Please upgrade to continue."}
+
+    # =====================
+    # MESSAGE LIMIT CHECK
+    # =====================
 
     limit = PLAN_LIMITS.get(plan, 1000)
 
     if message_count >= limit:
         conn.close()
-        return {
-            "reply": f"You have reached your {plan} plan limit of {limit} messages this month."
-        }
+        return {"reply": f"You have reached your {plan} plan limit of {limit} messages this month."}
 
     if not business_data:
         conn.close()
         return {"reply": "No business data configured yet."}
+
+    # =====================
+    # AI RESPONSE
+    # =====================
 
     response = client.responses.create(
         model="gpt-4o-mini",
