@@ -3,3 +3,4 @@ venv/
 data.db
 db.sqlite3
 *.pyc
+.env
