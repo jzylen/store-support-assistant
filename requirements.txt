@@ -1,7 +1,9 @@
 fastapi
 uvicorn
 openai
-python-jose
+python-jose[cryptography]
 passlib[argon2]
 psycopg2-binary
 python-multipart
+python-dotenv
+pydantic[email]
