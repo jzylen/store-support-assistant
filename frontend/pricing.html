@@ -1,134 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Relixo Pricing</title>
+  <meta charset="UTF-8" />
+  <title>Pricing — Relixo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f4f7fb;
-      padding: 60px 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .pricing-grid {
-      max-width: 1000px;
-      margin: auto;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 30px;
-    }
-
-    .plan {
-      background: white;
-      padding: 30px;
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-      text-align: center;
-    }
-
-    .price {
-      font-size: 32px;
-      font-weight: bold;
-      margin: 20px 0;
-    }
-
-    ul {
-      list-style: none;
       padding: 0;
-      margin: 20px 0;
     }
 
-    li {
-      margin: 10px 0;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f4ff;
+      min-height: 100vh;
     }
 
-    button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      margin-top: 15px;
+    /* NAVBAR */
+    .navbar {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    button:hover {
-      background: #1e40af;
+    .navbar .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2563eb;
     }
 
-    .trial {
-      color: #16a34a;
+    .navbar a {
+      font-size: 13px;
+      color: #6b7280;
+      text-decoration: none;
       font-weight: 500;
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
-<body>
-
-<h1>Choose Your Plan</h1>
-
-<div class="pricing-grid">
-
-  <div class="plan">
-    <h2>Starter</h2>
-    <div class="price">$19 / month</div>
-    <div class="trial">7-day free trial</div>
-    <ul>
-      <li>1,000 messages</li>
-      <li>AI customer support</li>
-      <li>Email support</li>
-    </ul>
-    <button onclick="selectPlan('starter')">Start Trial</button>
-  </div>
-
-  <div class="plan">
-    <h2>Growth</h2>
-    <div class="price">$49 / month</div>
-    <div class="trial">7-day free trial</div>
-    <ul>
-      <li>5,000 messages</li>
-      <li>Priority AI processing</li>
-      <li>Email support</li>
-    </ul>
-    <button onclick="selectPlan('growth')">Start Trial</button>
-  </div>
-
-  <div class="plan">
-    <h2>Pro</h2>
-    <div class="price">$99 / month</div>
-    <div class="trial">7-day free trial</div>
-    <ul>
-      <li>15,000 messages</li>
-      <li>High-priority processing</li>
-      <li>Priority support</li>
-    </ul>
-    <button onclick="selectPlan('pro')">Start Trial</button>
-  </div>
-
-</div>
-
-<script>
-  const API_URL = "https://store-support-backend-v2.onrender.com";
-  const token = localStorage.getItem("access_token");
-
-  function selectPlan(plan) {
-    if (!token) {
-      alert("Please login first.");
-      window.location.href = "index.html";
-      return;
+      transition: color 0.2s;
     }
 
-    // For now, just log selection.
-    // Paddle checkout will replace this.
-    alert("Plan selected: " + plan + ". Payment integration coming next.");
-  }
-</script>
+    .navbar a:hover {
+      color: #2563eb;
+    }
 
-</body>
-</html>
+    /* HEADER */
+    .page-header {
+      text-align: center;
+      padding: 56px 20px 40px;
+    }
+
+    .page-header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+
+    .page-header p {
+      font-size: 16px;
+      color: #6b7280;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
