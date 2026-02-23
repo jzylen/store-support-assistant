@@ -66,3 +66,322 @@
       max-width: 480px;
       margin: 0 auto;
       line-height: 1.6;
+    }
+
+    .trial-note {
+      display: inline-block;
+      margin-top: 16px;
+      background: #dbeafe;
+      color: #2563eb;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 20px;
+    }
+
+    /* PRICING GRID */
+    .pricing-grid {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .plan {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 28px;
+      box-shadow: 0 4px 24px rgba(37, 99, 235, 0.07);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .plan:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(37, 99, 235, 0.13);
+    }
+
+    .plan.featured {
+      background: #2563eb;
+      color: white;
+      box-shadow: 0 8px 32px rgba(37, 99, 235, 0.3);
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e40af;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .plan h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #111827;
+    }
+
+    .plan.featured h2 {
+      color: white;
+    }
+
+    .price {
+      font-size: 38px;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .plan.featured .price {
+      color: white;
+    }
+
+    .price span {
+      font-size: 16px;
+      font-weight: 500;
+      color: #9ca3af;
+    }
+
+    .plan.featured .price span {
+      color: #bfdbfe;
+    }
+
+    .trial-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #16a34a;
+      margin-bottom: 24px;
+      margin-top: 4px;
+    }
+
+    .plan.featured .trial-label {
+      color: #bbf7d0;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #f3f4f6;
+      margin: 0 0 24px;
+    }
+
+    .plan.featured .divider {
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 28px;
+      text-align: left;
+      flex: 1;
+    }
+
+    ul li {
+      font-size: 14px;
+      color: #374151;
+      padding: 7px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .plan.featured ul li {
+      color: #e0e7ff;
+    }
+
+    ul li::before {
+      content: "✓";
+      color: #2563eb;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .plan.featured ul li::before {
+      color: #bbf7d0;
+    }
+
+    .plan-btn {
+      width: 100%;
+      padding: 13px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .plan-btn:hover {
+      background: #1e40af;
+    }
+
+    .plan.featured .plan-btn {
+      background: white;
+      color: #2563eb;
+    }
+
+    .plan.featured .plan-btn:hover {
+      background: #eff6ff;
+    }
+
+    /* FAQ */
+    .faq {
+      max-width: 640px;
+      margin: 0 auto 60px;
+      padding: 0 20px;
+    }
+
+    .faq h2 {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 24px;
+    }
+
+    .faq-item {
+      background: white;
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 12px rgba(37, 99, 235, 0.06);
+    }
+
+    .faq-item h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+
+    .faq-item p {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 700px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <span class="logo">Relixo</span>
+  <a href="dashboard.html">← Back to Dashboard</a>
+</nav>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Simple, Transparent Pricing</h1>
+  <p>Start with a free trial. No credit card required. Cancel anytime.</p>
+  <span class="trial-note">🎉 All plans include a 7-day free trial</span>
+</div>
+
+<!-- PRICING GRID -->
+<div class="pricing-grid">
+
+  <!-- STARTER -->
+  <div class="plan">
+    <h2>Starter</h2>
+    <div class="price">$19<span>/mo</span></div>
+    <div class="trial-label">7-day free trial</div>
+    <hr class="divider" />
+    <ul>
+      <li>1,000 messages per month</li>
+      <li>AI customer support bot</li>
+      <li>Easy setup wizard</li>
+      <li>Email support</li>
+    </ul>
+    <button class="plan-btn" onclick="selectPlan('starter')">Start Free Trial</button>
+  </div>
+
+  <!-- GROWTH (FEATURED) -->
+  <div class="plan featured">
+    <div class="popular-badge">Most Popular</div>
+    <h2>Growth</h2>
+    <div class="price">$49<span>/mo</span></div>
+    <div class="trial-label">7-day free trial</div>
+    <hr class="divider" />
+    <ul>
+      <li>5,000 messages per month</li>
+      <li>Priority AI processing</li>
+      <li>Easy setup wizard</li>
+      <li>Email support</li>
+    </ul>
+    <button class="plan-btn" onclick="selectPlan('growth')">Start Free Trial</button>
+  </div>
+
+  <!-- PRO -->
+  <div class="plan">
+    <h2>Pro</h2>
+    <div class="price">$99<span>/mo</span></div>
+    <div class="trial-label">7-day free trial</div>
+    <hr class="divider" />
+    <ul>
+      <li>15,000 messages per month</li>
+      <li>High-priority processing</li>
+      <li>Easy setup wizard</li>
+      <li>Priority support</li>
+    </ul>
+    <button class="plan-btn" onclick="selectPlan('pro')">Start Free Trial</button>
+  </div>
+
+</div>
+
+<!-- FAQ -->
+<div class="faq">
+  <h2>Frequently Asked Questions</h2>
+
+  <div class="faq-item">
+    <h4>Do I need a credit card to start?</h4>
+    <p>No. Your 7-day free trial starts immediately with no credit card required.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>What happens when I hit my message limit?</h4>
+    <p>Your assistant will notify customers that the limit has been reached. You can upgrade your plan at any time to restore access.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>Can I cancel anytime?</h4>
+    <p>Yes. There are no long-term contracts. You can cancel or change your plan at any time from your dashboard.</p>
+  </div>
+</div>
+
+<script>
+  const API_URL = "https://store-support-backend-v2.onrender.com";
+  const token = localStorage.getItem("access_token");
+
+  if (!token) {
+    window.location.href = "login.html";
+  }
+
+  function selectPlan(plan) {
+    // Paddle payment integration will replace this
+    alert("Plan selected: " + plan + ". Payment integration coming soon.");
+  }
+</script>
+
+</body>
+</html>
