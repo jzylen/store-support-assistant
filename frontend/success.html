@@ -26,7 +26,7 @@
       background: white;
       border-radius: 20px;
       padding: 52px 48px;
-      max-width: 520px;
+      max-width: 560px;
       width: 100%;
       box-shadow: 0 8px 40px rgba(37, 99, 235, 0.1);
       text-align: center;
@@ -119,6 +119,7 @@
       color: #111827;
     }
 
+    /* EMBED SECTION */
     .embed-section {
       background: #f8faff;
       border-radius: 12px;
@@ -173,6 +174,94 @@
       background: #dbeafe;
     }
 
+    /* PLATFORM INSTRUCTIONS */
+    .platform-section {
+      background: #f8faff;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .platform-section h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2563eb;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+
+    .platform-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .platform-tab {
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid #e5e7eb;
+      background: white;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+
+    .platform-tab:hover {
+      border-color: #2563eb;
+      color: #2563eb;
+    }
+
+    .platform-tab.active {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    .platform-instructions {
+      display: none;
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.7;
+    }
+
+    .platform-instructions.active {
+      display: block;
+    }
+
+    .platform-instructions ol {
+      padding-left: 18px;
+      margin-top: 8px;
+    }
+
+    .platform-instructions ol li {
+      margin-bottom: 8px;
+    }
+
+    .platform-instructions code {
+      background: #e0e7ff;
+      color: #2563eb;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .platform-instructions .tip {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: #fffbeb;
+      border-left: 3px solid #f59e0b;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #92400e;
+    }
+
+    /* DASHBOARD BTN */
     .dashboard-btn {
       width: 100%;
       padding: 14px;
@@ -207,6 +296,7 @@
   <h1>You're all set!</h1>
   <p class="subtitle">Your AI assistant has been configured and is ready to start answering customer questions.</p>
 
+  <!-- STEPS -->
   <div class="steps">
     <h3>What happens next</h3>
     <div class="step">
@@ -215,7 +305,7 @@
     </div>
     <div class="step">
       <div class="step-number">2</div>
-      <div class="step-text"><strong>Embed it on your site</strong> — Copy the snippet below and paste it before the closing &lt;/body&gt; tag on your website.</div>
+      <div class="step-text"><strong>Embed it on your site</strong> — Copy the snippet below and paste it into your website using the instructions for your platform.</div>
     </div>
     <div class="step">
       <div class="step-number">3</div>
@@ -223,11 +313,92 @@
     </div>
   </div>
 
+  <!-- EMBED SNIPPET -->
   <div class="embed-section">
-    <h3>Embed on your website</h3>
-    <p>Paste this code before the closing &lt;/body&gt; tag on any page where you want the chat widget to appear.</p>
+    <h3>Your Embed Code</h3>
+    <p>This is your unique snippet. Copy it and follow the instructions below to add it to your website.</p>
     <pre id="snippet">Loading your embed code...</pre>
     <button class="copy-btn" onclick="copySnippet()" id="copyBtn">📋 Copy Embed Code</button>
+  </div>
+
+  <!-- PLATFORM INSTRUCTIONS -->
+  <div class="platform-section">
+    <h3>How to add it to your website</h3>
+
+    <div class="platform-tabs">
+      <button class="platform-tab active" onclick="showPlatform('shopify')">Shopify</button>
+      <button class="platform-tab" onclick="showPlatform('wordpress')">WordPress</button>
+      <button class="platform-tab" onclick="showPlatform('wix')">Wix</button>
+      <button class="platform-tab" onclick="showPlatform('squarespace')">Squarespace</button>
+      <button class="platform-tab" onclick="showPlatform('html')">Custom HTML</button>
+    </div>
+
+    <!-- SHOPIFY -->
+    <div class="platform-instructions active" id="instructions-shopify">
+      <ol>
+        <li>Log in to your <strong>Shopify Admin</strong></li>
+        <li>Go to <strong>Online Store → Themes</strong></li>
+        <li>Click <strong>Actions → Edit Code</strong> on your active theme</li>
+        <li>In the left sidebar open <code>Layout → theme.liquid</code></li>
+        <li>Find the closing <code>&lt;/body&gt;</code> tag near the bottom</li>
+        <li>Paste your embed code directly above it</li>
+        <li>Click <strong>Save</strong></li>
+      </ol>
+      <div class="tip">💡 The widget will now appear on every page of your Shopify store.</div>
+    </div>
+
+    <!-- WORDPRESS -->
+    <div class="platform-instructions" id="instructions-wordpress">
+      <ol>
+        <li>Log in to your <strong>WordPress Admin</strong></li>
+        <li>Go to <strong>Appearance → Theme Editor</strong></li>
+        <li>In the right sidebar select <code>footer.php</code></li>
+        <li>Find the closing <code>&lt;/body&gt;</code> tag</li>
+        <li>Paste your embed code directly above it</li>
+        <li>Click <strong>Update File</strong></li>
+      </ol>
+      <div class="tip">💡 Alternatively use a plugin like <strong>Insert Headers and Footers</strong> to paste the code without editing theme files directly.</div>
+    </div>
+
+    <!-- WIX -->
+    <div class="platform-instructions" id="instructions-wix">
+      <ol>
+        <li>Log in to your <strong>Wix account</strong></li>
+        <li>Go to your site's <strong>Dashboard</strong></li>
+        <li>Click <strong>Settings</strong> in the left menu</li>
+        <li>Scroll down and click <strong>Custom Code</strong></li>
+        <li>Click <strong>Add Custom Code</strong></li>
+        <li>Paste your embed code into the code box</li>
+        <li>Set placement to <strong>Body — End</strong></li>
+        <li>Set it to apply to <strong>All Pages</strong></li>
+        <li>Click <strong>Apply</strong></li>
+      </ol>
+      <div class="tip">💡 Custom Code is only available on paid Wix plans.</div>
+    </div>
+
+    <!-- SQUARESPACE -->
+    <div class="platform-instructions" id="instructions-squarespace">
+      <ol>
+        <li>Log in to your <strong>Squarespace account</strong></li>
+        <li>Go to <strong>Settings → Advanced</strong></li>
+        <li>Click <strong>Code Injection</strong></li>
+        <li>Paste your embed code into the <strong>Footer</strong> box</li>
+        <li>Click <strong>Save</strong></li>
+      </ol>
+      <div class="tip">💡 Code Injection is available on Business plans and above.</div>
+    </div>
+
+    <!-- CUSTOM HTML -->
+    <div class="platform-instructions" id="instructions-html">
+      <ol>
+        <li>Open your website's HTML file in your code editor</li>
+        <li>Find the closing <code>&lt;/body&gt;</code> tag at the bottom of the file</li>
+        <li>Paste your embed code directly above it</li>
+        <li>Save the file and upload it to your server</li>
+      </ol>
+      <div class="tip">💡 Add it to every page you want the widget to appear on, or add it to a shared layout/template file so it applies everywhere automatically.</div>
+    </div>
+
   </div>
 
   <button class="dashboard-btn" onclick="window.location.href='dashboard.html'">
@@ -270,8 +441,6 @@
     }
   }
 
-  loadSnippet();
-
   function copySnippet() {
     const snippet = document.getElementById("snippet").innerText;
     navigator.clipboard.writeText(snippet);
@@ -281,6 +450,24 @@
       btn.innerText = "📋 Copy Embed Code";
     }, 2000);
   }
+
+  function showPlatform(platform) {
+    // Hide all instructions
+    document.querySelectorAll(".platform-instructions").forEach(el => {
+      el.classList.remove("active");
+    });
+
+    // Deactivate all tabs
+    document.querySelectorAll(".platform-tab").forEach(el => {
+      el.classList.remove("active");
+    });
+
+    // Show selected
+    document.getElementById(`instructions-${platform}`).classList.add("active");
+    event.target.classList.add("active");
+  }
+
+  loadSnippet();
 </script>
 
 </body>
