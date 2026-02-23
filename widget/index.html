@@ -20,6 +20,7 @@
       border: none;
       cursor: pointer;
       font-size: 24px;
+      z-index: 9999;
     }
 
     #chat-box {
@@ -33,6 +34,7 @@
       box-shadow: 0 6px 18px rgba(0,0,0,0.25);
       display: none;
       flex-direction: column;
+      z-index: 9999;
     }
 
     #chat-header {
@@ -123,8 +125,8 @@
   const input = document.getElementById("messageInput");
   const sendBtn = document.getElementById("sendBtn");
 
-  const BUSINESS_ID = "516fdc82-5190-44bb-95a6-48d2ea37813b";
-  const API_URL = "https://store-support-assistant.onrender.com";
+  const API_URL = "https://store-support-backend-v2.onrender.com";
+  const TOKEN = localStorage.getItem("access_token");
 
   let openedOnce = false;
 
@@ -133,7 +135,7 @@
 
     if (!openedOnce) {
       addMessage(
-        "Hi 👋 I’m here to help with check-in times, Wi-Fi, and other hotel questions.",
+        "Hi 👋 I'm here to help with check-in times, Wi-Fi, and other hotel questions.",
         "bot"
       );
       openedOnce = true;
@@ -166,6 +168,11 @@
     const message = input.value.trim();
     if (!message) return;
 
+    if (!TOKEN) {
+      addMessage("Authentication error. Please log in again.", "bot");
+      return;
+    }
+
     addMessage(message, "user");
     input.value = "";
     sendBtn.disabled = true;
@@ -173,13 +180,13 @@
     showTyping();
 
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${API_URL}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          business_id: BUSINESS_ID,
-          message: message
-        })
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${TOKEN}`
+        },
+        body: JSON.stringify({ message: message })
       });
 
       const data = await response.json();
