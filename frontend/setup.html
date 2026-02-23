@@ -2,177 +2,272 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Set Up Your Store Assistant</title>
+  <title>Set Up Your Assistant — Relixo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f6f6f6;
-      padding: 40px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f4ff;
+      min-height: 100vh;
+      padding: 40px 20px;
     }
 
-    h1 {
-      max-width: 600px;
-      margin: auto;
-      margin-bottom: 20px;
+    .page-wrapper {
+      max-width: 640px;
+      margin: 0 auto;
     }
 
-    p {
-      max-width: 600px;
-      margin: auto;
-      margin-bottom: 20px;
-      color: #555;
-      font-size: 14px;
+    .page-header {
+      text-align: center;
+      margin-bottom: 32px;
     }
 
-    form {
-      max-width: 600px;
-      margin: auto;
+    .page-header .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    .page-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 10px;
+    }
+
+    .page-header p {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .card {
       background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-radius: 16px;
+      padding: 36px;
+      box-shadow: 0 4px 24px rgba(37, 99, 235, 0.08);
     }
 
     .row {
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
 
     label {
       display: block;
-      font-weight: bold;
-      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #111827;
+      margin-bottom: 4px;
     }
 
     .hint {
       font-size: 12px;
-      color: #777;
-      margin-bottom: 6px;
+      color: #9ca3af;
+      margin-bottom: 8px;
     }
 
     input[type="text"] {
       width: 100%;
-      padding: 10px;
+      padding: 11px 14px;
       font-size: 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s;
+      color: #111827;
     }
 
-    button {
+    input[type="text"]:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .submit-btn {
       width: 100%;
-      padding: 12px;
-      background: #111;
+      padding: 13px;
+      background: #2563eb;
       color: white;
       border: none;
-      font-size: 16px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+
+    .submit-btn:hover {
+      background: #1e40af;
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .error {
-      color: red;
-      margin-top: 10px;
+      color: #dc2626;
+      font-size: 13px;
+      margin-top: 12px;
       text-align: center;
+    }
+
+    .success {
+      color: #16a34a;
+      font-size: 13px;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #f3f4f6;
+      margin: 28px 0;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2563eb;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
 
-<h1>Set up your store assistant</h1>
-<p>
-Tell your AI assistant how your store works.  
-It will answer customer questions using only this information.
-</p>
+<div class="page-wrapper">
 
-<form id="setupForm">
-
-  <div class="row">
-    <label>Shipping time</label>
-    <div class="hint">Example: Orders ship within 2–3 business days</div>
-    <input id="shipping_time" type="text" value="Orders ship within 2–3 business days." />
+  <div class="page-header">
+    <span class="logo">Relixo</span>
+    <h1>Set up your AI assistant</h1>
+    <p>Tell your assistant how your business works. It will use this information to answer customer questions accurately.</p>
   </div>
 
-  <div class="row">
-    <label>Order tracking</label>
-    <div class="hint">Explain how customers track their orders</div>
-    <input id="order_tracking" type="text" value="Once shipped, customers receive a tracking link via email." />
+  <div class="card">
+    <form id="setupForm">
+
+      <div class="section-title">Shipping & Orders</div>
+
+      <div class="row">
+        <label>Shipping time</label>
+        <div class="hint">How long does it take for orders to ship?</div>
+        <input id="shipping_time" type="text" placeholder="e.g. Orders ship within 2–3 business days" />
+      </div>
+
+      <div class="row">
+        <label>Order tracking</label>
+        <div class="hint">How can customers track their orders?</div>
+        <input id="order_tracking" type="text" placeholder="e.g. A tracking link is sent to your email once shipped" />
+      </div>
+
+      <hr class="divider" />
+      <div class="section-title">Returns & Refunds</div>
+
+      <div class="row">
+        <label>Return policy</label>
+        <div class="hint">What is your returns policy?</div>
+        <input id="returns" type="text" placeholder="e.g. Returns accepted within 30 days of delivery" />
+      </div>
+
+      <div class="row">
+        <label>Refund timeline</label>
+        <div class="hint">How long do refunds take after approval?</div>
+        <input id="refunds" type="text" placeholder="e.g. Refunds processed within 5–7 business days" />
+      </div>
+
+      <hr class="divider" />
+      <div class="section-title">Support</div>
+
+      <div class="row">
+        <label>Customer support contact</label>
+        <div class="hint">Where should customers go if the AI can't help?</div>
+        <input id="support" type="text" placeholder="e.g. Email support@yourstore.com for further help" />
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Save & Continue</button>
+      <div id="error" class="error"></div>
+      <div id="success" class="success"></div>
+
+    </form>
   </div>
 
-  <div class="row">
-    <label>Return policy</label>
-    <div class="hint">Summarize your returns policy</div>
-    <input id="returns" type="text" value="Returns are accepted within 30 days of delivery." />
-  </div>
-
-  <div class="row">
-    <label>Refund timeline</label>
-    <div class="hint">How long refunds take after approval</div>
-    <input id="refunds" type="text" value="Refunds are processed within 5–7 business days." />
-  </div>
-
-  <div class="row">
-    <label>Customer support contact</label>
-    <div class="hint">Where customers should go if the AI can’t help</div>
-    <input id="support" type="text" value="Email support@yourstore.com for further assistance." />
-  </div>
-
-  <button type="submit">Save & Continue</button>
-  <div id="error" class="error"></div>
-</form>
+</div>
 
 <script>
-  const API_URL = "https://store-support-backend-v2.onrender.com"
+  const API_URL = "https://your-backend-service.onrender.com";
+  const token = localStorage.getItem("access_token");
 
-  const businessId = localStorage.getItem("business_id");
-  if (!businessId) {
-    alert("No business found. Please start again.");
-    window.location.href = "create.html";
+  // Redirect if not logged in
+  if (!token) {
+    window.location.href = "login.html";
   }
 
   document.getElementById("setupForm").onsubmit = async (e) => {
     e.preventDefault();
 
-    const data = {
-      shipping_time: {
-        value: document.getElementById("shipping_time").value,
-        enabled: true
-      },
-      order_tracking: {
-        value: document.getElementById("order_tracking").value,
-        enabled: true
-      },
-      returns: {
-        value: document.getElementById("returns").value,
-        enabled: true
-      },
-      refunds: {
-        value: document.getElementById("refunds").value,
-        enabled: true
-      },
-      support: {
-        value: document.getElementById("support").value,
-        enabled: true
-      }
-    };
+    const shipping_time = document.getElementById("shipping_time").value.trim();
+    const order_tracking = document.getElementById("order_tracking").value.trim();
+    const returns = document.getElementById("returns").value.trim();
+    const refunds = document.getElementById("refunds").value.trim();
+    const support = document.getElementById("support").value.trim();
+
+    if (!shipping_time || !order_tracking || !returns || !refunds || !support) {
+      document.getElementById("error").innerText = "Please fill in all fields before saving.";
+      return;
+    }
+
+    // Build a clean prompt string for the AI
+    const businessData = `
+You are a helpful customer support assistant.
+
+Shipping: ${shipping_time}
+Order Tracking: ${order_tracking}
+Returns: ${returns}
+Refunds: ${refunds}
+Support Contact: ${support}
+
+Always be friendly, concise, and only answer based on the information above.
+    `.trim();
+
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Saving...";
+    document.getElementById("error").innerText = "";
 
     try {
-      const res = await fetch(`${API_URL}/onboard/data`, {
+      const res = await fetch(`${API_URL}/business/setup`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          business_id: businessId,
-          data
-        })
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ data: businessData })
       });
 
-      const result = await res.json();
-      if (result.status !== "saved") {
+      if (!res.ok) {
         throw new Error("Save failed");
       }
 
-      window.location.href = "success.html";
+      document.getElementById("success").innerText = "Saved successfully! Redirecting...";
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 1500);
 
     } catch (err) {
-      document.getElementById("error").innerText =
-        "Failed to save store data. Please try again.";
+      document.getElementById("error").innerText = "Failed to save. Please try again.";
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Save & Continue";
     }
   };
 </script>
