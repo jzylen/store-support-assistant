@@ -162,15 +162,15 @@
   <div class="features">
     <div class="feature">
       <h3>📦 Shipping Questions</h3>
-      <p>“How long does shipping take?”</p>
+      <p>"How long does shipping take?"</p>
     </div>
     <div class="feature">
       <h3>🔎 Order Tracking</h3>
-      <p>“How do I track my order?”</p>
+      <p>"How do I track my order?"</p>
     </div>
     <div class="feature">
       <h3>↩️ Returns & Refunds</h3>
-      <p>“What’s your return policy?”</p>
+      <p>"What's your return policy?"</p>
     </div>
   </div>
 </section>
@@ -192,8 +192,8 @@
 </div>
 
 <script>
-  const BUSINESS_ID = localStorage.getItem("business_id");
-  const API_URL = "https://store-support-backend-v2.onrender.com"
+  const API_URL = "https://store-support-backend-v2.onrender.com";
+  const DEMO_TOKEN = "your_demo_account_jwt_token_here";
 
   const toggle = document.getElementById("chat-toggle");
   const box = document.getElementById("chat-box");
@@ -210,6 +210,11 @@
     }
   };
 
+  // Allow Enter key to send message
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
+
   function addMessage(text, sender) {
     const div = document.createElement("div");
     div.className = `message ${sender}`;
@@ -225,17 +230,32 @@
     addMessage(msg, "user");
     input.value = "";
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        business_id: BUSINESS_ID,
-        message: msg
-      })
-    });
+    // Show typing indicator
+    const typing = document.createElement("div");
+    typing.className = "message bot";
+    typing.id = "typing";
+    typing.innerText = "Typing...";
+    messages.appendChild(typing);
+    messages.scrollTop = messages.scrollHeight;
 
-    const data = await res.json();
-    addMessage(data.reply || "No response", "bot");
+    try {
+      const res = await fetch(`${API_URL}/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${DEMO_TOKEN}`
+        },
+        body: JSON.stringify({ message: msg })
+      });
+
+      const data = await res.json();
+      document.getElementById("typing").remove();
+      addMessage(data.reply || "No response", "bot");
+
+    } catch (error) {
+      document.getElementById("typing").remove();
+      addMessage("Something went wrong. Please try again.", "bot");
+    }
   }
 </script>
 
