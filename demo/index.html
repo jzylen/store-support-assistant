@@ -6,35 +6,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      color: #111;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f4ff;
+      color: #111827;
     }
 
     header {
-      padding: 60px 20px;
-      text-align: center;
       background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    header h1 {
-      font-size: 34px;
+    header .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2563eb;
+    }
+
+    header a {
+      font-size: 14px;
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 70px 20px 50px;
+    }
+
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 800;
+      color: #111827;
       margin-bottom: 16px;
+      line-height: 1.2;
     }
 
-    header p {
-      font-size: 18px;
-      color: #555;
-      max-width: 760px;
-      margin: 0 auto;
+    .hero p {
+      font-size: 17px;
+      color: #6b7280;
+      max-width: 580px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+    }
+
+    .hero .cta-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 13px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .hero .cta-btn:hover {
+      background: #1e40af;
     }
 
     .section {
-      padding: 50px 20px;
+      padding: 40px 20px 60px;
       max-width: 900px;
       margin: 0 auto;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2563eb;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
     }
 
     .features {
@@ -45,27 +103,39 @@
 
     .feature {
       background: white;
-      padding: 22px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(37, 99, 235, 0.07);
     }
 
     .feature h3 {
-      margin-top: 0;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+
+    .feature p {
+      font-size: 13px;
+      color: #6b7280;
+      font-style: italic;
     }
 
     footer {
       text-align: center;
       padding: 30px;
-      font-size: 14px;
-      color: #777;
+      font-size: 13px;
+      color: #9ca3af;
+      border-top: 1px solid #e5e7eb;
+      background: white;
     }
 
+    /* CHAT WIDGET */
     #chat-toggle {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #111;
+      background: #2563eb;
       color: white;
       border-radius: 50%;
       width: 56px;
@@ -74,6 +144,12 @@
       cursor: pointer;
       font-size: 24px;
       z-index: 9999;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      transition: background 0.2s;
+    }
+
+    #chat-toggle:hover {
+      background: #1e40af;
     }
 
     #chat-box {
@@ -81,82 +157,105 @@
       bottom: 90px;
       right: 20px;
       width: 340px;
-      height: 440px;
+      height: 460px;
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
       display: none;
       flex-direction: column;
       z-index: 9999;
+      overflow: hidden;
     }
 
     #chat-header {
-      background: #111;
+      background: #2563eb;
       color: white;
-      padding: 12px;
-      border-radius: 12px 12px 0 0;
-      text-align: center;
-      font-weight: bold;
+      padding: 16px;
+      font-weight: 600;
+      font-size: 15px;
     }
 
     #chat-messages {
       flex: 1;
-      padding: 12px;
+      padding: 14px;
       overflow-y: auto;
-      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .message {
       max-width: 80%;
-      margin-bottom: 10px;
-      padding: 8px 10px;
-      border-radius: 10px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 14px;
       line-height: 1.4;
     }
 
     .user {
       margin-left: auto;
-      background: #DCF8C6;
+      background: #2563eb;
+      color: white;
+      border-bottom-right-radius: 4px;
     }
 
     .bot {
       margin-right: auto;
-      background: #F1F0F0;
+      background: #e0e7ff;
+      color: #111827;
+      border-bottom-left-radius: 4px;
+    }
+
+    .typing {
+      font-style: italic;
+      font-size: 12px;
+      color: #9ca3af;
     }
 
     #chat-input {
       display: flex;
-      border-top: 1px solid #ddd;
+      border-top: 1px solid #e5e7eb;
     }
 
     #chat-input input {
       flex: 1;
-      padding: 10px;
+      padding: 12px 14px;
       border: none;
       outline: none;
+      font-size: 14px;
     }
 
     #chat-input button {
-      padding: 10px;
-      background: #111;
+      padding: 0 16px;
+      background: #2563eb;
       color: white;
       border: none;
       cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    #chat-input button:hover {
+      background: #1e40af;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Automated Customer Support for Online Stores</h1>
-  <p>
-    This AI assistant answers common customer questions about shipping,
-    order tracking, returns, and refunds — instantly and accurately.
-    Try it below.
-  </p>
+  <span class="logo">Relixo</span>
+  <a href="create.html">Get Started →</a>
 </header>
 
+<div class="hero">
+  <h1>AI Customer Support,<br/>Built for Your Business</h1>
+  <p>Instantly answer customer questions about shipping, returns, and orders — 24/7, without lifting a finger.</p>
+  <a href="create.html" class="cta-btn">Start Free Trial</a>
+</div>
+
 <section class="section">
+  <div class="section-title">What your assistant can handle</div>
   <div class="features">
     <div class="feature">
       <h3>📦 Shipping Questions</h3>
@@ -174,7 +273,7 @@
 </section>
 
 <footer>
-  Live demo • AI support assistant for online stores
+  Live demo • Powered by Relixo
 </footer>
 
 <button id="chat-toggle">💬</button>
@@ -199,10 +298,7 @@
   toggle.onclick = () => {
     box.style.display = box.style.display === "flex" ? "none" : "flex";
     if (messages.children.length === 0) {
-      addMessage(
-        "Hi 👋 I can help with shipping, order tracking, returns, and refunds.",
-        "bot"
-      );
+      addMessage("Hi 👋 I can help with shipping, order tracking, returns, and refunds.", "bot");
     }
   };
 
@@ -226,7 +322,7 @@
     input.value = "";
 
     const typing = document.createElement("div");
-    typing.className = "message bot";
+    typing.className = "typing";
     typing.id = "typing";
     typing.innerText = "Typing...";
     messages.appendChild(typing);

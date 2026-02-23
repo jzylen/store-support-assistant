@@ -13,7 +13,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f4f7fb;
+      background-color: #f0f4ff;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -128,12 +128,10 @@
   const input = document.getElementById("userInput");
   const sendBtn = document.getElementById("sendBtn");
 
-  // Redirect to login if no token
   if (!token) {
     window.location.href = "login.html";
   }
 
-  // Welcome message
   addMessage("Hi 👋 Welcome! How can I assist you today?", "bot");
 
   function addMessage(text, sender) {

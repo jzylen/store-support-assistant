@@ -4,15 +4,21 @@
   <meta charset="UTF-8" />
   <title>AI Chat Widget</title>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     #chat-toggle {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #111;
+      background: #2563eb;
       color: white;
       border-radius: 50%;
       width: 56px;
@@ -21,82 +27,101 @@
       cursor: pointer;
       font-size: 24px;
       z-index: 9999;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      transition: background 0.2s;
+    }
+
+    #chat-toggle:hover {
+      background: #1e40af;
     }
 
     #chat-box {
       position: fixed;
       bottom: 90px;
       right: 20px;
-      width: 320px;
-      height: 420px;
+      width: 340px;
+      height: 460px;
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
       display: none;
       flex-direction: column;
       z-index: 9999;
+      overflow: hidden;
     }
 
     #chat-header {
-      background: #111;
+      background: #2563eb;
       color: white;
-      padding: 12px;
-      border-radius: 12px 12px 0 0;
-      text-align: center;
-      font-weight: bold;
+      padding: 16px;
+      font-weight: 600;
+      font-size: 15px;
     }
 
     #chat-messages {
       flex: 1;
-      padding: 12px;
+      padding: 14px;
       overflow-y: auto;
-      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .message {
       max-width: 80%;
-      margin-bottom: 10px;
-      padding: 8px 10px;
-      border-radius: 10px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 14px;
       line-height: 1.4;
     }
 
     .user {
       margin-left: auto;
-      background: #DCF8C6;
-      text-align: right;
+      background: #2563eb;
+      color: white;
+      border-bottom-right-radius: 4px;
     }
 
     .bot {
       margin-right: auto;
-      background: #F1F0F0;
-      text-align: left;
+      background: #e0e7ff;
+      color: #111827;
+      border-bottom-left-radius: 4px;
     }
 
     .typing {
       font-style: italic;
       font-size: 12px;
-      color: #666;
+      color: #9ca3af;
+      align-self: flex-start;
     }
 
     #chat-input {
       display: flex;
-      border-top: 1px solid #ddd;
+      border-top: 1px solid #e5e7eb;
     }
 
     #chat-input input {
       flex: 1;
-      padding: 10px;
+      padding: 12px 14px;
       border: none;
       outline: none;
+      font-size: 14px;
     }
 
     #chat-input button {
-      padding: 10px 14px;
-      background: #111;
+      padding: 0 16px;
+      background: #2563eb;
       color: white;
       border: none;
       cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    #chat-input button:hover {
+      background: #1e40af;
     }
 
     #chat-input button:disabled {
@@ -119,25 +144,21 @@
 </div>
 
 <script>
+  const API_URL = "https://store-support-backend-v2.onrender.com";
+  const TOKEN = localStorage.getItem("access_token");
+
   const chatToggle = document.getElementById("chat-toggle");
   const chatBox = document.getElementById("chat-box");
   const messagesDiv = document.getElementById("chat-messages");
   const input = document.getElementById("messageInput");
   const sendBtn = document.getElementById("sendBtn");
 
-  const API_URL = "https://store-support-backend-v2.onrender.com";
-  const TOKEN = localStorage.getItem("access_token");
-
   let openedOnce = false;
 
   chatToggle.onclick = () => {
     chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
-
     if (!openedOnce) {
-      addMessage(
-        "Hi 👋 I'm here to help with check-in times, Wi-Fi, and other hotel questions.",
-        "bot"
-      );
+      addMessage("Hi 👋 I'm here to help. How can I assist you today?", "bot");
       openedOnce = true;
     }
   };
@@ -176,7 +197,6 @@
     addMessage(message, "user");
     input.value = "";
     sendBtn.disabled = true;
-
     showTyping();
 
     try {
