@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Security
+from fastapi import FastAPI, HTTPException, Security, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
@@ -10,6 +10,8 @@ from database import get_connection, init_db
 from contextlib import asynccontextmanager
 import uuid
 import os
+import hmac
+import hashlib
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -236,7 +238,7 @@ def get_usage(credentials: HTTPAuthorizationCredentials = Security(security)):
         JOIN businesses b ON u.business_id = b.id
         WHERE u.email = %s
     """, (email,))
-    
+
     result = cursor.fetchone()
     conn.close()
 
@@ -250,6 +252,27 @@ def get_usage(credentials: HTTPAuthorizationCredentials = Security(security)):
         "subscription_status": result["subscription_status"],
         "trial_ends_at": result["trial_ends_at"]
     }
+
+# =========================
+# GET BUSINESS ID FOR WIDGET
+# =========================
+
+@app.get("/business/id")
+def get_business_id(credentials: HTTPAuthorizationCredentials = Security(security)):
+    token = credentials.credentials
+    email = get_current_user(token)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT business_id FROM users WHERE email = %s", (email,))
+    result = cursor.fetchone()
+    conn.close()
+
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {"business_id": result["business_id"]}
 
 # =========================
 # CHAT WITH TRIAL + LIMIT ENFORCEMENT
@@ -270,7 +293,7 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
         JOIN businesses b ON u.business_id = b.id
         WHERE u.email = %s
     """, (email,))
-    
+
     result = cursor.fetchone()
 
     if not result:
@@ -284,11 +307,9 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
     subscription_status = result["subscription_status"]
     trial_ends_at = result["trial_ends_at"]
 
-    # Ensure trial_ends_at is a datetime object
     if isinstance(trial_ends_at, str):
         trial_ends_at = datetime.fromisoformat(trial_ends_at)
 
-    # Trial enforcement
     if subscription_status == "trialing":
         if datetime.utcnow() > trial_ends_at:
             cursor.execute("""
@@ -304,7 +325,6 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
         conn.close()
         return {"reply": "Subscription inactive. Please upgrade to continue."}
 
-    # Message limit enforcement
     limit = PLAN_LIMITS.get(plan, 1000)
 
     if message_count >= limit:
@@ -315,7 +335,79 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
         conn.close()
         return {"reply": "No business data configured yet."}
 
-    # AI response
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": business_data},
+            {"role": "user", "content": data.message}
+        ]
+    )
+
+    cursor.execute("""
+        UPDATE businesses
+        SET message_count = message_count + 1
+        WHERE id = %s
+    """, (business_id,))
+
+    conn.commit()
+    conn.close()
+
+    return {"reply": response.choices[0].message.content}
+
+# =========================
+# PUBLIC WIDGET ENDPOINT
+# =========================
+
+@app.post("/widget/chat/{business_id}")
+def widget_chat(business_id: str, data: ChatRequest):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT data, plan, message_count, subscription_status, trial_ends_at
+        FROM businesses
+        WHERE id = %s
+    """, (business_id,))
+
+    result = cursor.fetchone()
+
+    if not result:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Business not found")
+
+    business_data = result["data"]
+    plan = result["plan"]
+    message_count = result["message_count"]
+    subscription_status = result["subscription_status"]
+    trial_ends_at = result["trial_ends_at"]
+
+    if isinstance(trial_ends_at, str):
+        trial_ends_at = datetime.fromisoformat(trial_ends_at)
+
+    if subscription_status == "trialing":
+        if datetime.utcnow() > trial_ends_at:
+            cursor.execute("""
+                UPDATE businesses
+                SET subscription_status = 'expired'
+                WHERE id = %s
+            """, (business_id,))
+            conn.commit()
+            conn.close()
+            return {"reply": "This assistant is currently unavailable. Please contact the store directly."}
+
+    elif subscription_status not in ["active", "trialing"]:
+        conn.close()
+        return {"reply": "This assistant is currently unavailable. Please contact the store directly."}
+
+    limit = PLAN_LIMITS.get(plan, 1000)
+    if message_count >= limit:
+        conn.close()
+        return {"reply": "This assistant is currently unavailable. Please contact the store directly."}
+
+    if not business_data:
+        conn.close()
+        return {"reply": "This assistant is not configured yet."}
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[

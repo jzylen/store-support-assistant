@@ -32,6 +32,14 @@
       text-align: center;
     }
 
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 32px;
+      display: block;
+    }
+
     .success-icon {
       width: 72px;
       height: 72px;
@@ -42,14 +50,6 @@
       justify-content: center;
       font-size: 32px;
       margin: 0 auto 24px;
-    }
-
-    .logo {
-      font-size: 18px;
-      font-weight: 700;
-      color: #2563eb;
-      margin-bottom: 32px;
-      display: block;
     }
 
     h1 {
@@ -70,7 +70,7 @@
       background: #f8faff;
       border-radius: 12px;
       padding: 24px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
       text-align: left;
     }
 
@@ -123,7 +123,7 @@
       background: #f8faff;
       border-radius: 12px;
       padding: 24px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
       text-align: left;
     }
 
@@ -166,6 +166,7 @@
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s;
+      margin-bottom: 12px;
     }
 
     .copy-btn:hover {
@@ -225,7 +226,7 @@
   <div class="embed-section">
     <h3>Embed on your website</h3>
     <p>Paste this code before the closing &lt;/body&gt; tag on any page where you want the chat widget to appear.</p>
-    <pre id="snippet"></pre>
+    <pre id="snippet">Loading your embed code...</pre>
     <button class="copy-btn" onclick="copySnippet()" id="copyBtn">📋 Copy Embed Code</button>
   </div>
 
@@ -236,26 +237,43 @@
 
 <script>
   const API_URL = "https://store-support-backend-v2.onrender.com";
+  const FRONTEND_URL = "https://store-support-frontend.onrender.com";
   const token = localStorage.getItem("access_token");
 
   if (!token) {
     window.location.href = "login.html";
   }
 
-  // Build the embed snippet using the backend URL and token
-  const snippet =
+  async function loadSnippet() {
+    try {
+      const res = await fetch(`${API_URL}/business/id`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+      const businessId = data.business_id;
+
+      const snippet =
 `<script>
 (function () {
   var iframe = document.createElement("iframe");
-  iframe.src = "https://store-support-frontend.onrender.com";
+  iframe.src = "${FRONTEND_URL}/widget.html?business_id=${businessId}";
   iframe.style.cssText = "position:fixed;bottom:0;right:0;width:400px;height:520px;border:none;z-index:9999;";
   document.body.appendChild(iframe);
 })();
 <\/script>`;
 
-  document.getElementById("snippet").innerText = snippet;
+      document.getElementById("snippet").innerText = snippet;
+
+    } catch (err) {
+      document.getElementById("snippet").innerText = "Failed to load embed code. Please go to your dashboard and try again.";
+    }
+  }
+
+  loadSnippet();
 
   function copySnippet() {
+    const snippet = document.getElementById("snippet").innerText;
     navigator.clipboard.writeText(snippet);
     const btn = document.getElementById("copyBtn");
     btn.innerText = "✅ Copied!";

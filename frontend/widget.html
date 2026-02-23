@@ -145,7 +145,9 @@
 
 <script>
   const API_URL = "https://store-support-backend-v2.onrender.com";
-  const TOKEN = localStorage.getItem("access_token");
+
+  // Get business ID from URL parameter
+  const BUSINESS_ID = new URLSearchParams(window.location.search).get("business_id");
 
   const chatToggle = document.getElementById("chat-toggle");
   const chatBox = document.getElementById("chat-box");
@@ -189,8 +191,8 @@
     const message = input.value.trim();
     if (!message) return;
 
-    if (!TOKEN) {
-      addMessage("Authentication error. Please log in again.", "bot");
+    if (!BUSINESS_ID) {
+      addMessage("Widget configuration error. Please contact support.", "bot");
       return;
     }
 
@@ -200,12 +202,9 @@
     showTyping();
 
     try {
-      const response = await fetch(`${API_URL}/chat`, {
+      const response = await fetch(`${API_URL}/widget/chat/${BUSINESS_ID}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${TOKEN}`
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: message })
       });
 
