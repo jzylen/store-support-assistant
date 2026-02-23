@@ -61,8 +61,6 @@
       color: #777;
     }
 
-    /* ---------- CHAT WIDGET ---------- */
-
     #chat-toggle {
       position: fixed;
       bottom: 20px;
@@ -179,7 +177,6 @@
   Live demo • AI support assistant for online stores
 </footer>
 
-<!-- CHAT WIDGET -->
 <button id="chat-toggle">💬</button>
 
 <div id="chat-box">
@@ -193,7 +190,6 @@
 
 <script>
   const API_URL = "https://store-support-backend-v2.onrender.com";
-  const DEMO_TOKEN = "your_demo_account_jwt_token_here";
 
   const toggle = document.getElementById("chat-toggle");
   const box = document.getElementById("chat-box");
@@ -210,7 +206,6 @@
     }
   };
 
-  // Allow Enter key to send message
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendMessage();
   });
@@ -230,7 +225,6 @@
     addMessage(msg, "user");
     input.value = "";
 
-    // Show typing indicator
     const typing = document.createElement("div");
     typing.className = "message bot";
     typing.id = "typing";
@@ -239,12 +233,9 @@
     messages.scrollTop = messages.scrollHeight;
 
     try {
-      const res = await fetch(`${API_URL}/chat`, {
+      const res = await fetch(`${API_URL}/demo/chat`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${DEMO_TOKEN}`
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: msg })
       });
 

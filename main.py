@@ -55,6 +55,18 @@ PLAN_LIMITS = {
     "pro": 15000
 }
 
+DEMO_BUSINESS_DATA = """
+You are a helpful customer support assistant for an online store.
+You help customers with questions about shipping, order tracking, returns, and refunds.
+
+Shipping: Standard shipping takes 5-7 business days. Express shipping takes 1-2 business days.
+Order Tracking: Customers can track their order using the tracking link sent to their email.
+Returns: We accept returns within 30 days of purchase. Items must be unused and in original packaging.
+Refunds: Refunds are processed within 5-7 business days after we receive the returned item.
+
+Always be friendly, helpful, and concise.
+"""
+
 # =========================
 # MODELS
 # =========================
@@ -123,7 +135,7 @@ def register(data: RegisterRequest):
         """, (
             business_id,
             data.business_name,
-            datetime.utcnow().isoformat(),
+            datetime.utcnow(),
             "starter",
             0,
             "trialing",
@@ -137,7 +149,7 @@ def register(data: RegisterRequest):
             data.email,
             hash_password(data.password),
             business_id,
-            datetime.utcnow().isoformat()
+            datetime.utcnow()
         ))
 
         conn.commit()
@@ -321,4 +333,19 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
     conn.commit()
     conn.close()
 
+    return {"reply": response.choices[0].message.content}
+
+# =========================
+# PUBLIC DEMO ENDPOINT
+# =========================
+
+@app.post("/demo/chat")
+def demo_chat(data: ChatRequest):
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": DEMO_BUSINESS_DATA},
+            {"role": "user", "content": data.message}
+        ]
+    )
     return {"reply": response.choices[0].message.content}
