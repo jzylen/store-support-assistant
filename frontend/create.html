@@ -2,154 +2,333 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Automate Your Store’s Customer Support</title>
+  <title>Get Started — Relixo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f6f6f6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f4ff;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      margin: 0;
+      padding: 20px;
     }
 
-    .card {
-      background: white;
-      padding: 32px;
-      border-radius: 12px;
+    .wrapper {
+      display: flex;
+      max-width: 900px;
       width: 100%;
-      max-width: 460px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(37, 99, 235, 0.1);
+      overflow: hidden;
     }
 
-    h1 {
-      margin-top: 0;
-      font-size: 26px;
+    /* LEFT PANEL */
+    .left-panel {
+      background: #2563eb;
+      color: white;
+      padding: 48px 40px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
-    p {
-      color: #555;
-      font-size: 15px;
-      line-height: 1.4;
+    .left-panel .logo {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 40px;
     }
 
-    ul {
-      padding-left: 18px;
-      color: #444;
+    .left-panel h2 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .left-panel p {
       font-size: 14px;
+      color: #bfdbfe;
+      line-height: 1.7;
+      margin-bottom: 32px;
     }
 
-    li {
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #e0e7ff;
+    }
+
+    .feature-list li .check {
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .trial-badge {
+      display: inline-block;
+      margin-top: 32px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 20px;
+    }
+
+    /* RIGHT PANEL */
+    .right-panel {
+      padding: 48px 40px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .right-panel h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 8px;
+    }
+
+    .right-panel .subtitle {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
       margin-bottom: 6px;
     }
 
     input {
       width: 100%;
-      padding: 12px;
-      margin-top: 14px;
-      margin-bottom: 18px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      padding: 11px 14px;
+      font-size: 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s;
+      color: #111827;
     }
 
-    button {
+    input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .submit-btn {
       width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      background: #111;
+      padding: 13px;
+      background: #2563eb;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 6px;
     }
 
-    button:disabled {
-      background: #888;
+    .submit-btn:hover {
+      background: #1e40af;
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
       cursor: not-allowed;
     }
 
     .error {
-      color: red;
-      font-size: 14px;
-      margin-top: 10px;
+      color: #dc2626;
+      font-size: 13px;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .login-link a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 650px) {
+      .wrapper {
+        flex-direction: column;
+      }
+      .left-panel {
+        padding: 32px 24px;
+      }
+      .right-panel {
+        padding: 32px 24px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h1>Automate your store’s customer support</h1>
+<div class="wrapper">
 
-    <p>
-      Instantly reduce customer support tickets by letting an AI assistant
-      answer common questions about shipping, returns, and orders — 24/7.
-    </p>
-
-    <ul>
-      <li>Answer “Where is my order?” automatically</li>
-      <li>Handle shipping & return questions instantly</li>
-      <li>Reduce repetitive support emails</li>
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="logo">Relixo</div>
+    <h2>AI customer support for your business</h2>
+    <p>Set up your AI assistant in under 2 minutes and start answering customer questions automatically.</p>
+    <ul class="feature-list">
+      <li>
+        <span class="check">✓</span>
+        Answer shipping & order questions 24/7
+      </li>
+      <li>
+        <span class="check">✓</span>
+        Reduce repetitive support emails
+      </li>
+      <li>
+        <span class="check">✓</span>
+        Easy setup, no technical skills needed
+      </li>
+      <li>
+        <span class="check">✓</span>
+        Works on any website
+      </li>
     </ul>
-
-    <p><strong>Create your store assistant in under 2 minutes.</strong></p>
-
-    <input
-      id="businessName"
-      type="text"
-      placeholder="Your store name (e.g. Urban Streetwear)"
-    />
-
-    <button id="createBtn">Create My Store Assistant</button>
-
-    <div id="error" class="error"></div>
+    <span class="trial-badge">🎉 7-day free trial — no credit card needed</span>
   </div>
 
-<script>
-  const API_URL = "https://store-support-backend-v2.onrender.com"
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <h1>Create your account</h1>
+    <p class="subtitle">Get started for free. No credit card required.</p>
 
-  const button = document.getElementById("createBtn");
-  const input = document.getElementById("businessName");
+    <div class="form-group">
+      <label>Store name</label>
+      <input
+        id="businessName"
+        type="text"
+        placeholder="e.g. Urban Streetwear"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Email address</label>
+      <input
+        id="email"
+        type="email"
+        placeholder="you@example.com"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <input
+        id="password"
+        type="password"
+        placeholder="At least 8 characters"
+      />
+    </div>
+
+    <button class="submit-btn" id="createBtn">Create My Account →</button>
+    <div id="error" class="error"></div>
+
+    <div class="login-link">
+      Already have an account? <a href="login.html">Log in</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API_URL = "https://store-support-backend-v2.onrender.com";
+
+  const createBtn = document.getElementById("createBtn");
   const errorDiv = document.getElementById("error");
 
-  button.onclick = async () => {
+  createBtn.onclick = async () => {
     errorDiv.innerText = "";
 
-    const name = input.value.trim();
-    if (!name) {
-      errorDiv.innerText = "Please enter your store name.";
+    const business_name = document.getElementById("businessName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!business_name || !email || !password) {
+      errorDiv.innerText = "Please fill in all fields.";
       return;
     }
 
-    button.disabled = true;
-    button.innerText = "Creating assistant...";
+    if (password.length < 8) {
+      errorDiv.innerText = "Password must be at least 8 characters.";
+      return;
+    }
+
+    createBtn.disabled = true;
+    createBtn.innerText = "Creating account...";
 
     try {
-      const res = await fetch(`${API_URL}/onboard/business`, {
+      const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name })
+        body: JSON.stringify({ business_name, email, password })
       });
 
       const data = await res.json();
 
-      if (!data.business_id) {
-        throw new Error("Invalid response");
+      if (!data.access_token) {
+        throw new Error(data.detail || "Registration failed");
       }
 
-      localStorage.setItem("business_id", data.business_id);
-      localStorage.setItem("business_name", data.name);
-
+      localStorage.setItem("access_token", data.access_token);
       window.location.href = "setup.html";
 
     } catch (err) {
-      errorDiv.innerText =
-        "Failed to create assistant. Make sure the server is running.";
-      button.disabled = false;
-      button.innerText = "Create My Store Assistant";
+      errorDiv.innerText = err.message || "Failed to create account. Please try again.";
+      createBtn.disabled = false;
+      createBtn.innerText = "Create My Account →";
     }
   };
 </script>
