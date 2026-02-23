@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>Relixo Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background-color: #f4f7fb;
       display: flex;
@@ -64,7 +71,9 @@
 
     .typing {
       font-style: italic;
-      opacity: 0.7;
+      font-size: 12px;
+      color: #666;
+      align-self: flex-start;
     }
 
     .input-area {
@@ -72,7 +81,7 @@
       border-top: 1px solid #e5e7eb;
     }
 
-    input {
+    .input-area input {
       flex: 1;
       padding: 14px;
       border: none;
@@ -80,37 +89,34 @@
       font-size: 14px;
     }
 
-    button {
+    .input-area button {
       padding: 0 20px;
       border: none;
       background: #2563eb;
       color: white;
       cursor: pointer;
       font-weight: 500;
+      font-size: 14px;
     }
 
-    button:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
-    }
-
-    button:hover:not(:disabled) {
+    .input-area button:hover {
       background: #1e40af;
+    }
+
+    .input-area button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
 
 <div class="chat-container">
-  <div class="chat-header">
-    Relixo Assistant
-  </div>
-
+  <div class="chat-header">Relixo Assistant</div>
   <div class="messages" id="messages"></div>
-
   <div class="input-area">
     <input type="text" id="userInput" placeholder="Type your message..." />
-    <button id="sendBtn" onclick="sendMessage()">Send</button>
+    <button id="sendBtn">Send</button>
   </div>
 </div>
 
@@ -122,21 +128,35 @@
   const input = document.getElementById("userInput");
   const sendBtn = document.getElementById("sendBtn");
 
+  // Redirect to login if no token
   if (!token) {
-    window.location.href = "index.html";
+    window.location.href = "login.html";
   }
 
-  function addMessage(text, sender, isTyping = false) {
+  // Welcome message
+  addMessage("Hi 👋 Welcome! How can I assist you today?", "bot");
+
+  function addMessage(text, sender) {
     const msg = document.createElement("div");
     msg.classList.add("message", sender);
-    if (isTyping) msg.classList.add("typing");
     msg.innerText = text;
     messagesDiv.appendChild(msg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    return msg;
   }
 
-  addMessage("Hi 👋 Welcome! How can I assist you today?", "bot");
+  function showTyping() {
+    const typing = document.createElement("div");
+    typing.className = "typing";
+    typing.id = "typing";
+    typing.innerText = "Bot is typing…";
+    messagesDiv.appendChild(typing);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  function removeTyping() {
+    const typing = document.getElementById("typing");
+    if (typing) typing.remove();
+  }
 
   async function sendMessage() {
     const text = input.value.trim();
@@ -146,34 +166,35 @@
     input.value = "";
     sendBtn.disabled = true;
 
-    const typingIndicator = addMessage("Typing...", "bot", true);
+    showTyping();
 
     try {
-      const response = await fetch(API_URL + "/chat", {
+      const response = await fetch(`${API_URL}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ message: text })
       });
 
       const data = await response.json();
-      typingIndicator.remove();
-      addMessage(data.reply, "bot");
+      removeTyping();
+      addMessage(data.reply || "No response", "bot");
 
     } catch (error) {
-      typingIndicator.remove();
-      addMessage("Something went wrong. Please try again.", "bot");
+      removeTyping();
+      addMessage("Error connecting to server.", "bot");
     }
 
     sendBtn.disabled = false;
+    input.focus();
   }
 
-  input.addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-      sendMessage();
-    }
+  sendBtn.onclick = sendMessage;
+
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
   });
 </script>
 
