@@ -27,6 +27,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05);
+      animation: fadeInDown 0.4s ease;
     }
 
     .navbar .logo {
@@ -51,6 +56,7 @@
     .page-header {
       text-align: center;
       padding: 56px 20px 40px;
+      animation: fadeInUp 0.5s ease 0.1s both;
     }
 
     .page-header h1 {
@@ -77,6 +83,67 @@
       font-weight: 600;
       padding: 6px 16px;
       border-radius: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    /* BILLING TOGGLE */
+    .billing-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 40px;
+      animation: fadeIn 0.5s ease 0.3s both;
+    }
+
+    .billing-toggle span {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6b7280;
+    }
+
+    .billing-toggle span.active {
+      color: #111827;
+    }
+
+    .toggle-switch {
+      width: 44px;
+      height: 24px;
+      background: #e5e7eb;
+      border-radius: 99px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.3s;
+      border: none;
+    }
+
+    .toggle-switch.yearly {
+      background: #2563eb;
+    }
+
+    .toggle-knob {
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch.yearly .toggle-knob {
+      transform: translateX(20px);
+    }
+
+    .save-badge {
+      background: #dcfce7;
+      color: #16a34a;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
     }
 
     /* PRICING GRID */
@@ -99,17 +166,28 @@
       flex-direction: column;
       transition: transform 0.2s, box-shadow 0.2s;
       position: relative;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
     }
 
+    .plan:nth-child(1) { animation-delay: 0.2s; }
+    .plan:nth-child(2) { animation-delay: 0.3s; }
+    .plan:nth-child(3) { animation-delay: 0.4s; }
+
     .plan:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(37, 99, 235, 0.13);
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.15);
     }
 
     .plan.featured {
       background: #2563eb;
       color: white;
       box-shadow: 0 8px 32px rgba(37, 99, 235, 0.3);
+      transform: translateY(-8px);
+    }
+
+    .plan.featured:hover {
+      transform: translateY(-14px);
     }
 
     .popular-badge {
@@ -125,6 +203,7 @@
       border-radius: 20px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      white-space: nowrap;
     }
 
     .plan h2 {
@@ -134,20 +213,17 @@
       color: #111827;
     }
 
-    .plan.featured h2 {
-      color: white;
-    }
+    .plan.featured h2 { color: white; }
 
     .price {
       font-size: 38px;
       font-weight: 800;
       color: #111827;
       margin-bottom: 4px;
+      transition: all 0.3s ease;
     }
 
-    .plan.featured .price {
-      color: white;
-    }
+    .plan.featured .price { color: white; }
 
     .price span {
       font-size: 16px;
@@ -155,9 +231,7 @@
       color: #9ca3af;
     }
 
-    .plan.featured .price span {
-      color: #bfdbfe;
-    }
+    .plan.featured .price span { color: #bfdbfe; }
 
     .trial-label {
       font-size: 13px;
@@ -167,9 +241,7 @@
       margin-top: 4px;
     }
 
-    .plan.featured .trial-label {
-      color: #bbf7d0;
-    }
+    .plan.featured .trial-label { color: #bbf7d0; }
 
     .divider {
       border: none;
@@ -177,9 +249,7 @@
       margin: 0 0 24px;
     }
 
-    .plan.featured .divider {
-      border-color: rgba(255,255,255,0.2);
-    }
+    .plan.featured .divider { border-color: rgba(255,255,255,0.2); }
 
     ul {
       list-style: none;
@@ -198,9 +268,7 @@
       gap: 10px;
     }
 
-    .plan.featured ul li {
-      color: #e0e7ff;
-    }
+    .plan.featured ul li { color: #e0e7ff; }
 
     ul li::before {
       content: "✓";
@@ -210,9 +278,7 @@
       flex-shrink: 0;
     }
 
-    .plan.featured ul li::before {
-      color: #bbf7d0;
-    }
+    .plan.featured ul li::before { color: #bbf7d0; }
 
     .plan-btn {
       width: 100%;
@@ -224,11 +290,16 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
     }
 
     .plan-btn:hover {
       background: #1e40af;
+      transform: scale(1.02);
+    }
+
+    .plan-btn:active {
+      transform: scale(0.98);
     }
 
     .plan.featured .plan-btn {
@@ -253,6 +324,7 @@
       font-weight: 700;
       color: #111827;
       margin-bottom: 24px;
+      animation: fadeInUp 0.5s ease 0.5s both;
     }
 
     .faq-item {
@@ -261,25 +333,80 @@
       padding: 18px 22px;
       margin-bottom: 12px;
       box-shadow: 0 2px 12px rgba(37, 99, 235, 0.06);
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
+      transition: box-shadow 0.2s;
     }
 
-    .faq-item h4 {
+    .faq-item:nth-child(1) { animation-delay: 0.6s; }
+    .faq-item:nth-child(2) { animation-delay: 0.7s; }
+    .faq-item:nth-child(3) { animation-delay: 0.8s; }
+
+    .faq-item:hover {
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1);
+    }
+
+    .faq-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .faq-header h4 {
       font-size: 14px;
       font-weight: 600;
       color: #111827;
-      margin-bottom: 6px;
     }
 
-    .faq-item p {
+    .faq-arrow {
+      font-size: 12px;
+      color: #9ca3af;
+      transition: transform 0.3s;
+    }
+
+    .faq-item.open .faq-arrow {
+      transform: rotate(180deg);
+    }
+
+    .faq-body {
       font-size: 13px;
       color: #6b7280;
       line-height: 1.6;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, margin-top 0.3s ease;
+    }
+
+    .faq-item.open .faq-body {
+      max-height: 200px;
+      margin-top: 10px;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
     }
 
     @media (max-width: 700px) {
-      .pricing-grid {
-        grid-template-columns: 1fr;
-      }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .plan.featured { transform: none; }
     }
   </style>
 </head>
@@ -298,19 +425,30 @@
   <span class="trial-note">🎉 All plans include a 7-day free trial</span>
 </div>
 
+<!-- BILLING TOGGLE -->
+<div class="billing-toggle">
+  <span class="active" id="monthlyLabel">Monthly</span>
+  <button class="toggle-switch" id="billingToggle" onclick="toggleBilling()">
+    <div class="toggle-knob"></div>
+  </button>
+  <span id="yearlyLabel">Yearly</span>
+  <span class="save-badge">Save 20%</span>
+</div>
+
 <!-- PRICING GRID -->
 <div class="pricing-grid">
 
   <!-- STARTER -->
   <div class="plan">
     <h2>Starter</h2>
-    <div class="price">$19<span>/mo</span></div>
+    <div class="price" id="price-starter">$19<span>/mo</span></div>
     <div class="trial-label">7-day free trial</div>
     <hr class="divider" />
     <ul>
       <li>1,000 messages per month</li>
       <li>AI customer support bot</li>
-      <li>Easy setup wizard</li>
+      <li>Full setup wizard</li>
+      <li>Embeddable widget</li>
       <li>Email support</li>
     </ul>
     <button class="plan-btn" onclick="selectPlan('starter')">Start Free Trial</button>
@@ -320,13 +458,14 @@
   <div class="plan featured">
     <div class="popular-badge">Most Popular</div>
     <h2>Growth</h2>
-    <div class="price">$49<span>/mo</span></div>
+    <div class="price" id="price-growth">$49<span>/mo</span></div>
     <div class="trial-label">7-day free trial</div>
     <hr class="divider" />
     <ul>
       <li>5,000 messages per month</li>
       <li>Priority AI processing</li>
-      <li>Easy setup wizard</li>
+      <li>Full setup wizard</li>
+      <li>Embeddable widget</li>
       <li>Email support</li>
     </ul>
     <button class="plan-btn" onclick="selectPlan('growth')">Start Free Trial</button>
@@ -335,13 +474,14 @@
   <!-- PRO -->
   <div class="plan">
     <h2>Pro</h2>
-    <div class="price">$99<span>/mo</span></div>
+    <div class="price" id="price-pro">$99<span>/mo</span></div>
     <div class="trial-label">7-day free trial</div>
     <hr class="divider" />
     <ul>
       <li>15,000 messages per month</li>
       <li>High-priority processing</li>
-      <li>Easy setup wizard</li>
+      <li>Full setup wizard</li>
+      <li>Embeddable widget</li>
       <li>Priority support</li>
     </ul>
     <button class="plan-btn" onclick="selectPlan('pro')">Start Free Trial</button>
@@ -353,32 +493,67 @@
 <div class="faq">
   <h2>Frequently Asked Questions</h2>
 
-  <div class="faq-item">
-    <h4>Do I need a credit card to start?</h4>
-    <p>No. Your 7-day free trial starts immediately with no credit card required.</p>
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-header">
+      <h4>Do I need a credit card to start?</h4>
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-body">No. Your 7-day free trial starts immediately with no credit card required. You only need to add payment details when you decide to upgrade.</div>
   </div>
 
-  <div class="faq-item">
-    <h4>What happens when I hit my message limit?</h4>
-    <p>Your assistant will notify customers that the limit has been reached. You can upgrade your plan at any time to restore access.</p>
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-header">
+      <h4>What happens when I hit my message limit?</h4>
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-body">Your assistant will let customers know it's temporarily unavailable and direct them to your support contact. You can upgrade your plan at any time to restore full access. Message counts reset at the start of every month.</div>
   </div>
 
-  <div class="faq-item">
-    <h4>Can I cancel anytime?</h4>
-    <p>Yes. There are no long-term contracts. You can cancel or change your plan at any time from your dashboard.</p>
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-header">
+      <h4>Can I cancel anytime?</h4>
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-body">Yes. There are no long-term contracts. You can cancel or change your plan at any time from your dashboard with no penalty.</div>
   </div>
+
 </div>
 
 <script>
   const API_URL = "https://store-support-backend-v2.onrender.com";
   const token = localStorage.getItem("access_token");
 
-  if (!token) {
-    window.location.href = "login.html";
+  if (!token) window.location.href = "login.html";
+
+  let isYearly = false;
+
+  const prices = {
+    monthly: { starter: "$19", growth: "$49", pro: "$99" },
+    yearly:  { starter: "$15", growth: "$39", pro: "$79" }
+  };
+
+  function toggleBilling() {
+    isYearly = !isYearly;
+    const toggle = document.getElementById("billingToggle");
+    const monthlyLabel = document.getElementById("monthlyLabel");
+    const yearlyLabel = document.getElementById("yearlyLabel");
+
+    toggle.classList.toggle("yearly", isYearly);
+    monthlyLabel.classList.toggle("active", !isYearly);
+    yearlyLabel.classList.toggle("active", isYearly);
+
+    const p = isYearly ? prices.yearly : prices.monthly;
+    document.getElementById("price-starter").innerHTML = `${p.starter}<span>/mo</span>`;
+    document.getElementById("price-growth").innerHTML = `${p.growth}<span>/mo</span>`;
+    document.getElementById("price-pro").innerHTML = `${p.pro}<span>/mo</span>`;
+  }
+
+  function toggleFaq(item) {
+    item.classList.toggle("open");
   }
 
   function selectPlan(plan) {
-    // Paddle payment integration will replace this
+    // Paddle payment integration coming soon
     alert("Plan selected: " + plan + ". Payment integration coming soon.");
   }
 </script>
