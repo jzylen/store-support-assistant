@@ -20,6 +20,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      animation: fadeIn 0.5s ease;
     }
 
     .wrapper {
@@ -30,6 +31,7 @@
       border-radius: 20px;
       box-shadow: 0 8px 40px rgba(37, 99, 235, 0.1);
       overflow: hidden;
+      animation: slideUp 0.5s ease;
     }
 
     /* LEFT PANEL */
@@ -76,7 +78,14 @@
       gap: 12px;
       font-size: 14px;
       color: #e0e7ff;
+      animation: fadeInLeft 0.5s ease forwards;
+      opacity: 0;
     }
+
+    .feature-list li:nth-child(1) { animation-delay: 0.1s; }
+    .feature-list li:nth-child(2) { animation-delay: 0.2s; }
+    .feature-list li:nth-child(3) { animation-delay: 0.3s; }
+    .feature-list li:nth-child(4) { animation-delay: 0.4s; }
 
     .feature-list li .check {
       background: rgba(255,255,255,0.2);
@@ -114,7 +123,12 @@
 
     .form-group {
       margin-bottom: 18px;
+      animation: fadeInUp 0.4s ease forwards;
+      opacity: 0;
     }
+
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
 
     label {
       display: block;
@@ -131,7 +145,7 @@
       border: 1.5px solid #e5e7eb;
       border-radius: 8px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
       color: #111827;
     }
 
@@ -140,6 +154,40 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
+    input.error-field {
+      border-color: #dc2626;
+    }
+
+    /* PASSWORD WRAPPER */
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper input {
+      padding-right: 44px;
+    }
+
+    .eye-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #9ca3af;
+      font-size: 18px;
+      padding: 4px;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+    }
+
+    .eye-btn:hover {
+      color: #2563eb;
+    }
+
+    /* SUBMIT BTN */
     .submit-btn {
       width: 100%;
       padding: 13px;
@@ -150,7 +198,7 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
       margin-top: 6px;
     }
 
@@ -158,9 +206,26 @@
       background: #1e40af;
     }
 
+    .submit-btn:active {
+      transform: scale(0.98);
+    }
+
     .submit-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+    }
+
+    /* LOADING SPINNER */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
     }
 
     .error {
@@ -168,6 +233,7 @@
       font-size: 13px;
       margin-top: 12px;
       text-align: center;
+      animation: shake 0.3s ease;
     }
 
     .register-link {
@@ -187,16 +253,58 @@
       text-decoration: underline;
     }
 
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #e5e7eb;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-12px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
     @media (max-width: 650px) {
-      .wrapper {
-        flex-direction: column;
-      }
-      .left-panel {
-        padding: 32px 24px;
-      }
-      .right-panel {
-        padding: 32px 24px;
-      }
+      .wrapper { flex-direction: column; }
+      .left-panel { padding: 32px 24px; }
+      .right-panel { padding: 32px 24px; }
     }
   </style>
 </head>
@@ -210,22 +318,10 @@
     <h2>Welcome back</h2>
     <p>Log in to manage your AI assistant, view your usage, and upgrade your plan.</p>
     <ul class="feature-list">
-      <li>
-        <span class="check">✓</span>
-        View your message usage
-      </li>
-      <li>
-        <span class="check">✓</span>
-        Update your assistant settings
-      </li>
-      <li>
-        <span class="check">✓</span>
-        Test your AI chat assistant
-      </li>
-      <li>
-        <span class="check">✓</span>
-        Manage your subscription
-      </li>
+      <li><span class="check">✓</span> View your message usage</li>
+      <li><span class="check">✓</span> Update your assistant settings</li>
+      <li><span class="check">✓</span> Test your AI chat assistant</li>
+      <li><span class="check">✓</span> Manage your subscription</li>
     </ul>
   </div>
 
@@ -245,15 +341,24 @@
 
     <div class="form-group">
       <label>Password</label>
-      <input
-        id="password"
-        type="password"
-        placeholder="Your password"
-      />
+      <div class="password-wrapper">
+        <input
+          id="password"
+          type="password"
+          placeholder="Your password"
+        />
+        <button class="eye-btn" type="button" onclick="togglePassword()" id="eyeBtn">
+          👁
+        </button>
+      </div>
     </div>
 
-    <button class="submit-btn" id="loginBtn">Log In →</button>
+    <button class="submit-btn" id="loginBtn" onclick="handleLogin()">
+      Log In →
+    </button>
     <div id="error" class="error"></div>
+
+    <div class="divider">or</div>
 
     <div class="register-link">
       Don't have an account? <a href="create.html">Start free trial</a>
@@ -264,28 +369,43 @@
 
 <script>
   const API_URL = "https://store-support-backend-v2.onrender.com";
+  let passwordVisible = false;
 
-  const loginBtn = document.getElementById("loginBtn");
-  const errorDiv = document.getElementById("error");
-
-  // If already logged in, go straight to dashboard
+  // Redirect if already logged in
   if (localStorage.getItem("access_token")) {
     window.location.href = "dashboard.html";
   }
 
-  loginBtn.onclick = async () => {
+  function togglePassword() {
+    const input = document.getElementById("password");
+    const btn = document.getElementById("eyeBtn");
+    passwordVisible = !passwordVisible;
+    input.type = passwordVisible ? "text" : "password";
+    btn.innerText = passwordVisible ? "🙈" : "👁";
+  }
+
+  async function handleLogin() {
+    const errorDiv = document.getElementById("error");
+    const loginBtn = document.getElementById("loginBtn");
     errorDiv.innerText = "";
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
-    if (!email || !password) {
-      errorDiv.innerText = "Please enter your email and password.";
+    if (!email) {
+      errorDiv.innerText = "Please enter your email address.";
+      document.getElementById("email").classList.add("error-field");
+      return;
+    }
+
+    if (!password) {
+      errorDiv.innerText = "Please enter your password.";
+      document.getElementById("password").classList.add("error-field");
       return;
     }
 
     loginBtn.disabled = true;
-    loginBtn.innerText = "Logging in...";
+    loginBtn.innerHTML = '<span class="spinner"></span> Logging in...';
 
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
@@ -301,18 +421,35 @@
       }
 
       localStorage.setItem("access_token", data.access_token);
-      window.location.href = "dashboard.html";
+      loginBtn.innerHTML = "✓ Logged In!";
+      loginBtn.style.background = "#16a34a";
+
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 800);
 
     } catch (err) {
       errorDiv.innerText = err.message || "Login failed. Please try again.";
       loginBtn.disabled = false;
-      loginBtn.innerText = "Log In →";
+      loginBtn.innerHTML = "Log In →";
+      document.getElementById("password").classList.add("error-field");
     }
-  };
+  }
 
-  // Allow Enter key to submit
+  // Clear error state on input
+  document.getElementById("email").addEventListener("input", () => {
+    document.getElementById("email").classList.remove("error-field");
+    document.getElementById("error").innerText = "";
+  });
+
+  document.getElementById("password").addEventListener("input", () => {
+    document.getElementById("password").classList.remove("error-field");
+    document.getElementById("error").innerText = "";
+  });
+
+  // Enter key support
   document.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") loginBtn.click();
+    if (e.key === "Enter") handleLogin();
   });
 </script>
 
