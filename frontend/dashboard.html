@@ -18,7 +18,7 @@
       min-height: 100vh;
     }
 
-    /* NAV */
+    /* NAVBAR */
     .navbar {
       background: white;
       border-bottom: 1px solid #e5e7eb;
@@ -27,6 +27,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05);
+      animation: fadeInDown 0.4s ease;
     }
 
     .navbar .logo {
@@ -38,10 +43,10 @@
     .navbar .nav-right {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
 
-    .navbar .nav-right button {
+    .nav-btn {
       background: none;
       border: 1.5px solid #e5e7eb;
       color: #374151;
@@ -53,9 +58,20 @@
       transition: all 0.2s;
     }
 
-    .navbar .nav-right button:hover {
+    .nav-btn:hover {
       border-color: #2563eb;
       color: #2563eb;
+    }
+
+    .nav-btn.primary {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    .nav-btn.primary:hover {
+      background: #1e40af;
+      border-color: #1e40af;
     }
 
     /* MAIN */
@@ -70,12 +86,28 @@
       font-weight: 700;
       color: #111827;
       margin-bottom: 6px;
+      animation: fadeInUp 0.4s ease 0.1s both;
     }
 
     .page-subtitle {
       font-size: 14px;
       color: #6b7280;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
+      animation: fadeInUp 0.4s ease 0.2s both;
+    }
+
+    /* TRIAL BANNER */
+    .trial-banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-size: 13px;
+      color: #1d4ed8;
+      margin-bottom: 28px;
+      display: none;
+      animation: fadeIn 0.4s ease;
+      display: none;
     }
 
     /* STAT CARDS */
@@ -83,7 +115,7 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 20px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
     .stat-card {
@@ -91,9 +123,22 @@
       padding: 24px;
       border-radius: 14px;
       box-shadow: 0 4px 24px rgba(37, 99, 235, 0.07);
+      opacity: 0;
+      animation: fadeInUp 0.4s ease forwards;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .stat-card .stat-label {
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(37, 99, 235, 0.12);
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .stat-label {
       font-size: 12px;
       font-weight: 600;
       color: #9ca3af;
@@ -102,15 +147,13 @@
       margin-bottom: 10px;
     }
 
-    .stat-card .stat-value {
+    .stat-value {
       font-size: 26px;
       font-weight: 700;
       color: #111827;
     }
 
-    .stat-card .stat-value.blue {
-      color: #2563eb;
-    }
+    .stat-value.blue { color: #2563eb; }
 
     .badge {
       display: inline-block;
@@ -120,25 +163,10 @@
       font-weight: 600;
     }
 
-    .badge.trialing {
-      background: #dbeafe;
-      color: #2563eb;
-    }
-
-    .badge.active {
-      background: #dcfce7;
-      color: #16a34a;
-    }
-
-    .badge.expired {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-
-    .badge.inactive {
-      background: #f3f4f6;
-      color: #6b7280;
-    }
+    .badge.trialing { background: #dbeafe; color: #2563eb; }
+    .badge.active { background: #dcfce7; color: #16a34a; }
+    .badge.expired { background: #fee2e2; color: #dc2626; }
+    .badge.inactive { background: #f3f4f6; color: #6b7280; }
 
     /* USAGE BAR */
     .usage-card {
@@ -146,7 +174,9 @@
       border-radius: 14px;
       padding: 28px;
       box-shadow: 0 4px 24px rgba(37, 99, 235, 0.07);
-      margin-bottom: 28px;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeInUp 0.4s ease 0.5s forwards;
     }
 
     .usage-card h3 {
@@ -162,67 +192,23 @@
       height: 10px;
       width: 100%;
       margin-bottom: 8px;
+      overflow: hidden;
     }
 
     .usage-bar-fill {
       background: #2563eb;
       border-radius: 99px;
       height: 10px;
-      transition: width 0.5s ease;
+      width: 0%;
+      transition: width 1s ease;
     }
 
-    .usage-bar-fill.warning {
-      background: #f59e0b;
-    }
-
-    .usage-bar-fill.danger {
-      background: #dc2626;
-    }
+    .usage-bar-fill.warning { background: #f59e0b; }
+    .usage-bar-fill.danger { background: #dc2626; }
 
     .usage-label {
       font-size: 13px;
       color: #6b7280;
-    }
-
-    /* UPGRADE BOX */
-    .upgrade-card {
-      background: #2563eb;
-      border-radius: 14px;
-      padding: 28px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 24px rgba(37, 99, 235, 0.2);
-    }
-
-    .upgrade-card .upgrade-text h3 {
-      font-size: 17px;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 6px;
-    }
-
-    .upgrade-card .upgrade-text p {
-      font-size: 14px;
-      color: #bfdbfe;
-    }
-
-    .upgrade-card .upgrade-btn {
-      background: white;
-      color: #2563eb;
-      border: none;
-      padding: 11px 24px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.2s;
-      white-space: nowrap;
-      margin-left: 24px;
-    }
-
-    .upgrade-card .upgrade-btn:hover {
-      opacity: 0.9;
     }
 
     /* QUICK ACTIONS */
@@ -230,7 +216,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
     .action-card {
@@ -241,55 +227,121 @@
       cursor: pointer;
       transition: box-shadow 0.2s, transform 0.2s;
       text-decoration: none;
+      display: block;
+      opacity: 0;
+      animation: fadeInUp 0.4s ease forwards;
     }
+
+    .action-card:nth-child(1) { animation-delay: 0.6s; }
+    .action-card:nth-child(2) { animation-delay: 0.7s; }
+    .action-card:nth-child(3) { animation-delay: 0.8s; }
 
     .action-card:hover {
       box-shadow: 0 8px 30px rgba(37, 99, 235, 0.12);
-      transform: translateY(-2px);
+      transform: translateY(-3px);
     }
 
-    .action-card .action-icon {
+    .action-icon {
       font-size: 24px;
       margin-bottom: 10px;
     }
 
-    .action-card .action-title {
+    .action-title {
       font-size: 14px;
       font-weight: 600;
       color: #111827;
       margin-bottom: 4px;
     }
 
-    .action-card .action-desc {
+    .action-desc {
       font-size: 12px;
       color: #9ca3af;
     }
 
-    /* TRIAL BANNER */
-    .trial-banner {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 10px;
-      padding: 14px 20px;
-      font-size: 13px;
-      color: #1d4ed8;
-      margin-bottom: 28px;
-      display: none;
+    /* UPGRADE CARD */
+    .upgrade-card {
+      background: #2563eb;
+      border-radius: 14px;
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 24px rgba(37, 99, 235, 0.2);
+      opacity: 0;
+      animation: fadeInUp 0.4s ease 0.9s forwards;
+    }
+
+    .upgrade-text h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 6px;
+    }
+
+    .upgrade-text p {
+      font-size: 14px;
+      color: #bfdbfe;
+    }
+
+    .upgrade-btn {
+      background: white;
+      color: #2563eb;
+      border: none;
+      padding: 11px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+      margin-left: 24px;
+    }
+
+    .upgrade-btn:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+
+    /* SKELETON LOADER */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f4ff 25%, #e0e7ff 50%, #f0f4ff 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+      height: 26px;
+      width: 60%;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 700px) {
-      .card-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .actions-grid {
-        grid-template-columns: 1fr;
-      }
+      .card-grid { grid-template-columns: repeat(2, 1fr); }
+      .actions-grid { grid-template-columns: 1fr; }
       .upgrade-card {
         flex-direction: column;
         gap: 16px;
         text-align: center;
       }
-      .upgrade-card .upgrade-btn {
+      .upgrade-btn {
         margin-left: 0;
         width: 100%;
       }
@@ -302,15 +354,16 @@
 <nav class="navbar">
   <span class="logo">Relixo</span>
   <div class="nav-right">
-    <button onclick="window.location.href='setup.html'">⚙️ Edit Assistant</button>
-    <button onclick="logout()">Log out</button>
+    <button class="nav-btn" onclick="window.location.href='setup.html'">⚙️ Edit Assistant</button>
+    <button class="nav-btn primary" onclick="window.location.href='pricing.html'">Upgrade</button>
+    <button class="nav-btn" onclick="logout()">Log out</button>
   </div>
 </nav>
 
 <!-- MAIN -->
 <div class="container">
 
-  <p class="page-title">Dashboard</p>
+  <p class="page-title" id="pageTitle">Dashboard</p>
   <p class="page-subtitle">Welcome back! Here's an overview of your account.</p>
 
   <!-- TRIAL BANNER -->
@@ -320,19 +373,19 @@
   <div class="card-grid">
     <div class="stat-card">
       <div class="stat-label">Current Plan</div>
-      <div class="stat-value blue" id="plan">—</div>
+      <div class="stat-value blue" id="plan"><div class="skeleton"></div></div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Messages Used</div>
-      <div class="stat-value" id="used">—</div>
+      <div class="stat-value" id="used"><div class="skeleton"></div></div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Monthly Limit</div>
-      <div class="stat-value" id="limit">—</div>
+      <div class="stat-value" id="limit"><div class="skeleton"></div></div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Status</div>
-      <div class="stat-value" id="status">—</div>
+      <div class="stat-value" id="status"><div class="skeleton"></div></div>
     </div>
   </div>
 
@@ -340,7 +393,7 @@
   <div class="usage-card">
     <h3>Message Usage This Month</h3>
     <div class="usage-bar-bg">
-      <div class="usage-bar-fill" id="usageBar" style="width: 0%"></div>
+      <div class="usage-bar-fill" id="usageBar"></div>
     </div>
     <div class="usage-label" id="usageLabel">Loading...</div>
   </div>
@@ -364,7 +417,7 @@
     </a>
   </div>
 
-  <!-- UPGRADE BOX -->
+  <!-- UPGRADE CARD -->
   <div class="upgrade-card">
     <div class="upgrade-text">
       <h3>Ready to grow?</h3>
@@ -381,9 +434,7 @@
   const API_URL = "https://store-support-backend-v2.onrender.com";
   const token = localStorage.getItem("access_token");
 
-  if (!token) {
-    window.location.href = "login.html";
-  }
+  if (!token) window.location.href = "login.html";
 
   function logout() {
     localStorage.removeItem("access_token");
@@ -391,7 +442,23 @@
   }
 
   function capitalize(str) {
+    if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  // Animate number counting up
+  function animateCount(el, target) {
+    let start = 0;
+    const duration = 800;
+    const step = Math.ceil(target / (duration / 16));
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) {
+        start = target;
+        clearInterval(timer);
+      }
+      el.innerText = start.toLocaleString();
+    }, 16);
   }
 
   async function loadUsage() {
@@ -404,24 +471,37 @@
 
       const data = await res.json();
 
-      // Stat cards
+      // Page title with business name if available
+      document.getElementById("pageTitle").innerText = "Dashboard";
+
+      // Plan
       document.getElementById("plan").innerText = capitalize(data.plan);
-      document.getElementById("used").innerText = data.message_count.toLocaleString();
-      document.getElementById("limit").innerText = data.limit.toLocaleString();
+
+      // Messages used — animated count
+      const usedEl = document.getElementById("used");
+      usedEl.innerText = "0";
+      animateCount(usedEl, data.message_count);
+
+      // Limit — animated count
+      const limitEl = document.getElementById("limit");
+      limitEl.innerText = "0";
+      animateCount(limitEl, data.limit);
 
       // Status badge
-      const statusEl = document.getElementById("status");
       const status = data.subscription_status;
-      statusEl.innerHTML = `<span class="badge ${status}">${capitalize(status)}</span>`;
+      document.getElementById("status").innerHTML =
+        `<span class="badge ${status}">${capitalize(status)}</span>`;
 
-      // Usage bar
-      const percent = Math.min((data.message_count / data.limit) * 100, 100);
-      const bar = document.getElementById("usageBar");
-      bar.style.width = `${percent}%`;
-      if (percent >= 90) bar.classList.add("danger");
-      else if (percent >= 70) bar.classList.add("warning");
-      document.getElementById("usageLabel").innerText =
-        `${data.message_count.toLocaleString()} of ${data.limit.toLocaleString()} messages used (${Math.round(percent)}%)`;
+      // Usage bar — animate after short delay
+      setTimeout(() => {
+        const percent = Math.min((data.message_count / data.limit) * 100, 100);
+        const bar = document.getElementById("usageBar");
+        bar.style.width = `${percent}%`;
+        if (percent >= 90) bar.classList.add("danger");
+        else if (percent >= 70) bar.classList.add("warning");
+        document.getElementById("usageLabel").innerText =
+          `${data.message_count.toLocaleString()} of ${data.limit.toLocaleString()} messages used (${Math.round(percent)}%)`;
+      }, 600);
 
       // Trial banner
       if (status === "trialing" && data.trial_ends_at) {
