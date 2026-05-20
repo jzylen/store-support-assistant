@@ -115,6 +115,25 @@ def get_current_user(token: str):
         raise HTTPException(status_code=401, detail="Invalid token")
 
 # =========================
+# MONTHLY RESET HELPER
+# =========================
+
+def check_and_reset_monthly_count(cursor, business_id, last_reset_at):
+    now = datetime.utcnow()
+
+    # If never reset before or it's been more than a month
+    if last_reset_at is None or (now.year > last_reset_at.year or now.month > last_reset_at.month):
+        cursor.execute("""
+            UPDATE businesses
+            SET message_count = 0,
+                last_reset_at = %s
+            WHERE id = %s
+        """, (now, business_id))
+        return 0
+
+    return None
+
+# =========================
 # AUTH ROUTES
 # =========================
 
@@ -132,8 +151,8 @@ def register(data: RegisterRequest):
     try:
         cursor.execute("""
             INSERT INTO businesses 
-            (id, name, created_at, plan, message_count, subscription_status, trial_ends_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            (id, name, created_at, plan, message_count, subscription_status, trial_ends_at, last_reset_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             business_id,
             data.business_name,
@@ -141,7 +160,8 @@ def register(data: RegisterRequest):
             "starter",
             0,
             "trialing",
-            trial_end
+            trial_end,
+            datetime.utcnow()
         ))
 
         cursor.execute("""
@@ -233,16 +253,16 @@ def get_usage(credentials: HTTPAuthorizationCredentials = Security(security)):
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT b.plan, b.message_count, b.subscription_status, b.trial_ends_at
+        SELECT b.plan, b.message_count, b.subscription_status, b.trial_ends_at, b.last_reset_at
         FROM users u
         JOIN businesses b ON u.business_id = b.id
         WHERE u.email = %s
     """, (email,))
 
     result = cursor.fetchone()
-    conn.close()
 
     if not result:
+        conn.close()
         raise HTTPException(status_code=404, detail="User not found")
 
     return {
@@ -250,7 +270,8 @@ def get_usage(credentials: HTTPAuthorizationCredentials = Security(security)):
         "message_count": result["message_count"],
         "limit": PLAN_LIMITS.get(result["plan"], 1000),
         "subscription_status": result["subscription_status"],
-        "trial_ends_at": result["trial_ends_at"]
+        "trial_ends_at": result["trial_ends_at"],
+        "last_reset_at": result["last_reset_at"]
     }
 
 # =========================
@@ -288,7 +309,7 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
 
     cursor.execute("""
         SELECT b.id, b.data, b.plan, b.message_count,
-               b.subscription_status, b.trial_ends_at
+               b.subscription_status, b.trial_ends_at, b.last_reset_at
         FROM users u
         JOIN businesses b ON u.business_id = b.id
         WHERE u.email = %s
@@ -306,10 +327,21 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
     message_count = result["message_count"]
     subscription_status = result["subscription_status"]
     trial_ends_at = result["trial_ends_at"]
+    last_reset_at = result["last_reset_at"]
 
     if isinstance(trial_ends_at, str):
         trial_ends_at = datetime.fromisoformat(trial_ends_at)
 
+    if isinstance(last_reset_at, str):
+        last_reset_at = datetime.fromisoformat(last_reset_at)
+
+    # Check and reset monthly count if needed
+    reset_count = check_and_reset_monthly_count(cursor, business_id, last_reset_at)
+    if reset_count is not None:
+        message_count = reset_count
+        conn.commit()
+
+    # Trial enforcement
     if subscription_status == "trialing":
         if datetime.utcnow() > trial_ends_at:
             cursor.execute("""
@@ -364,7 +396,7 @@ def widget_chat(business_id: str, data: ChatRequest):
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT data, plan, message_count, subscription_status, trial_ends_at
+        SELECT data, plan, message_count, subscription_status, trial_ends_at, last_reset_at
         FROM businesses
         WHERE id = %s
     """, (business_id,))
@@ -380,9 +412,19 @@ def widget_chat(business_id: str, data: ChatRequest):
     message_count = result["message_count"]
     subscription_status = result["subscription_status"]
     trial_ends_at = result["trial_ends_at"]
+    last_reset_at = result["last_reset_at"]
 
     if isinstance(trial_ends_at, str):
         trial_ends_at = datetime.fromisoformat(trial_ends_at)
+
+    if isinstance(last_reset_at, str):
+        last_reset_at = datetime.fromisoformat(last_reset_at)
+
+    # Check and reset monthly count if needed
+    reset_count = check_and_reset_monthly_count(cursor, business_id, last_reset_at)
+    if reset_count is not None:
+        message_count = reset_count
+        conn.commit()
 
     if subscription_status == "trialing":
         if datetime.utcnow() > trial_ends_at:

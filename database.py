@@ -27,7 +27,8 @@ def init_db():
             subscription_status TEXT DEFAULT 'inactive',
             trial_ends_at TIMESTAMP,
             paddle_subscription_id TEXT,
-            created_at TIMESTAMP DEFAULT NOW()
+            created_at TIMESTAMP DEFAULT NOW(),
+            last_reset_at TIMESTAMP DEFAULT NOW()
         );
     """)
 
