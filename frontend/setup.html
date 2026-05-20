@@ -20,53 +20,160 @@
     }
 
     .page-wrapper {
-      max-width: 640px;
+      max-width: 680px;
       margin: 0 auto;
     }
 
+    /* HEADER */
     .page-header {
       text-align: center;
       margin-bottom: 32px;
+      animation: fadeInDown 0.5s ease;
     }
 
-    .page-header .logo {
+    .logo {
       font-size: 22px;
       font-weight: 700;
       color: #2563eb;
-      margin-bottom: 24px;
       display: block;
+      margin-bottom: 24px;
     }
 
     .page-header h1 {
       font-size: 26px;
-      font-weight: 700;
+      font-weight: 800;
       color: #111827;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .page-header p {
       font-size: 15px;
       color: #6b7280;
-      line-height: 1.6;
     }
 
+    /* PROGRESS BAR */
+    .progress-wrapper {
+      margin-bottom: 32px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .progress-steps::before {
+      content: "";
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #e5e7eb;
+      z-index: 0;
+    }
+
+    .progress-fill {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      height: 2px;
+      background: #2563eb;
+      z-index: 1;
+      transition: width 0.4s ease;
+    }
+
+    .step-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #9ca3af;
+      z-index: 2;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .step-dot.active {
+      border-color: #2563eb;
+      color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .step-dot.completed {
+      border-color: #2563eb;
+      background: #2563eb;
+      color: white;
+    }
+
+    .step-labels {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .step-label {
+      font-size: 11px;
+      color: #9ca3af;
+      font-weight: 500;
+      text-align: center;
+      width: 32px;
+      transition: color 0.3s ease;
+    }
+
+    .step-label.active {
+      color: #2563eb;
+    }
+
+    /* CARD */
     .card {
       background: white;
       border-radius: 16px;
       padding: 36px;
       box-shadow: 0 4px 24px rgba(37, 99, 235, 0.08);
+      animation: fadeInUp 0.4s ease;
     }
 
-    .row {
-      margin-bottom: 24px;
+    .step-content {
+      display: none;
+    }
+
+    .step-content.active {
+      display: block;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+
+    .section-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    /* FORM ELEMENTS */
+    .form-group {
+      margin-bottom: 20px;
     }
 
     label {
       display: block;
+      font-size: 13px;
       font-weight: 600;
-      font-size: 14px;
-      color: #111827;
-      margin-bottom: 4px;
+      color: #374151;
+      margin-bottom: 6px;
     }
 
     .hint {
@@ -75,24 +182,228 @@
       margin-bottom: 8px;
     }
 
-    input[type="text"] {
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
       width: 100%;
       padding: 11px 14px;
       font-size: 14px;
       border: 1.5px solid #e5e7eb;
       border-radius: 8px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
       color: #111827;
+      font-family: inherit;
     }
 
-    input[type="text"]:focus {
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus,
+    select:focus {
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
-    .submit-btn {
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* PERSONALITY CARDS */
+    .personality-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .personality-card {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .personality-card:hover {
+      border-color: #2563eb;
+      background: #f8faff;
+    }
+
+    .personality-card.selected {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .personality-card .emoji {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .personality-card .name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .personality-card .desc {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    /* PRODUCT ENTRY */
+    .product-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .product-tab {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid #e5e7eb;
+      background: white;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+
+    .product-tab.active {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    .product-entry-mode {
+      display: none;
+    }
+
+    .product-entry-mode.active {
+      display: block;
+    }
+
+    .product-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .product-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 8px;
+      align-items: center;
+      background: #f8faff;
+      padding: 12px;
+      border-radius: 8px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .product-item input {
+      margin: 0;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: #dc2626;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      transition: opacity 0.2s;
+    }
+
+    .remove-btn:hover {
+      opacity: 0.7;
+    }
+
+    .add-product-btn {
       width: 100%;
+      padding: 10px;
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1.5px dashed #bfdbfe;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .add-product-btn:hover {
+      background: #dbeafe;
+    }
+
+    /* HOURS GRID */
+    .hours-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hours-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .hours-row label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      margin: 0;
+    }
+
+    .hours-row input {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .closed-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #6b7280;
+      cursor: pointer;
+    }
+
+    /* NAVIGATION BUTTONS */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn-back {
+      flex: 1;
+      padding: 13px;
+      background: white;
+      color: #374151;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+      border-color: #2563eb;
+      color: #2563eb;
+    }
+
+    .btn-next {
+      flex: 2;
       padding: 13px;
       background: #2563eb;
       color: white;
@@ -102,14 +413,13 @@
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s;
-      margin-top: 8px;
     }
 
-    .submit-btn:hover {
+    .btn-next:hover {
       background: #1e40af;
     }
 
-    .submit-btn:disabled {
+    .btn-next:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
@@ -128,19 +438,35 @@
       text-align: center;
     }
 
+    /* DIVIDER */
     .divider {
       border: none;
       border-top: 1px solid #f3f4f6;
-      margin: 28px 0;
+      margin: 24px 0;
     }
 
-    .section-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #2563eb;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 20px;
+    /* ANIMATIONS */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 24px; }
+      .personality-grid { grid-template-columns: 1fr; }
+      .hours-row { grid-template-columns: 1fr 1fr; }
+      .hours-row label { grid-column: 1 / -1; }
+      .product-item { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -151,98 +477,443 @@
   <div class="page-header">
     <span class="logo">Relixo</span>
     <h1>Set up your AI assistant</h1>
-    <p>Tell your assistant how your business works. It will use this information to answer customer questions accurately.</p>
+    <p>Configure your assistant in detail so it knows your business inside out.</p>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrapper">
+    <div class="progress-steps" id="progressSteps">
+      <div class="progress-fill" id="progressFill"></div>
+      <div class="step-dot active" id="dot-1">1</div>
+      <div class="step-dot" id="dot-2">2</div>
+      <div class="step-dot" id="dot-3">3</div>
+      <div class="step-dot" id="dot-4">4</div>
+      <div class="step-dot" id="dot-5">5</div>
+    </div>
+    <div class="step-labels">
+      <span class="step-label active" id="label-1">Identity</span>
+      <span class="step-label" id="label-2">Products</span>
+      <span class="step-label" id="label-3">Policies</span>
+      <span class="step-label" id="label-4">Hours</span>
+      <span class="step-label" id="label-5">Support</span>
+    </div>
   </div>
 
   <div class="card">
-    <form id="setupForm">
 
-      <div class="section-title">Shipping & Orders</div>
+    <!-- STEP 1: BOT IDENTITY -->
+    <div class="step-content active" id="step-1">
+      <div class="section-title">Bot Identity</div>
+      <div class="section-subtitle">Give your assistant a name and personality that matches your brand.</div>
 
-      <div class="row">
-        <label>Shipping time</label>
-        <div class="hint">How long does it take for orders to ship?</div>
-        <input id="shipping_time" type="text" placeholder="e.g. Orders ship within 2–3 business days" />
+      <div class="form-group">
+        <label>Assistant Name</label>
+        <div class="hint">What should your bot be called? e.g. Aria, Max, Luna</div>
+        <input type="text" id="bot_name" placeholder="e.g. Aria" />
       </div>
 
-      <div class="row">
-        <label>Order tracking</label>
+      <div class="form-group">
+        <label>Greeting Message</label>
+        <div class="hint">The first message customers see when they open the chat</div>
+        <input type="text" id="greeting" placeholder="e.g. Hi! I'm Aria, how can I help you today?" />
+      </div>
+
+      <div class="form-group">
+        <label>Personality & Tone</label>
+        <div class="hint">Choose the tone that best matches your brand</div>
+        <div class="personality-grid">
+          <div class="personality-card" onclick="selectPersonality('friendly')" id="p-friendly">
+            <div class="emoji">😊</div>
+            <div class="name">Friendly & Casual</div>
+            <div class="desc">Warm, approachable and conversational</div>
+          </div>
+          <div class="personality-card" onclick="selectPersonality('professional')" id="p-professional">
+            <div class="emoji">💼</div>
+            <div class="name">Professional & Formal</div>
+            <div class="desc">Polished, precise and business-like</div>
+          </div>
+          <div class="personality-card" onclick="selectPersonality('luxury')" id="p-luxury">
+            <div class="emoji">✨</div>
+            <div class="name">Luxury & Elegant</div>
+            <div class="desc">Sophisticated, refined and premium</div>
+          </div>
+          <div class="personality-card" onclick="selectPersonality('calm')" id="p-calm">
+            <div class="emoji">🌿</div>
+            <div class="name">Calm & Supportive</div>
+            <div class="desc">Patient, empathetic and reassuring</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-next" onclick="nextStep(1)">Next: Products →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: PRODUCTS -->
+    <div class="step-content" id="step-2">
+      <div class="section-title">Products & Services</div>
+      <div class="section-subtitle">Tell your assistant about what you sell so it can answer product questions accurately.</div>
+
+      <div class="product-tabs">
+        <button class="product-tab active" onclick="switchProductMode('structured')">Add by item</button>
+        <button class="product-tab" onclick="switchProductMode('freetext')">Free text</button>
+      </div>
+
+      <!-- STRUCTURED -->
+      <div class="product-entry-mode active" id="mode-structured">
+        <div class="product-list" id="productList">
+          <div class="product-item">
+            <input type="text" placeholder="Product name" class="product-name" />
+            <input type="text" placeholder="Price e.g. $29" class="product-price" />
+            <input type="text" placeholder="Stock e.g. 50 units" class="product-stock" />
+            <button class="remove-btn" onclick="removeProduct(this)">×</button>
+          </div>
+        </div>
+        <button class="add-product-btn" onclick="addProduct()">+ Add Another Product</button>
+      </div>
+
+      <!-- FREE TEXT -->
+      <div class="product-entry-mode" id="mode-freetext">
+        <textarea id="products_freetext" placeholder="Describe your products freely. e.g.&#10;- Blue Sneakers: $59, 30 in stock&#10;- Red Hoodie: $45, out of stock&#10;- White T-Shirt: $25, available in S/M/L"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="prevStep(2)">← Back</button>
+        <button class="btn-next" onclick="nextStep(2)">Next: Policies →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: POLICIES -->
+    <div class="step-content" id="step-3">
+      <div class="section-title">Shipping & Policies</div>
+      <div class="section-subtitle">Your assistant will use this to answer questions about shipping, returns and refunds.</div>
+
+      <div class="form-group">
+        <label>Shipping Time</label>
+        <div class="hint">How long does delivery take?</div>
+        <input type="text" id="shipping_time" placeholder="e.g. Standard shipping takes 5-7 business days" />
+      </div>
+
+      <div class="form-group">
+        <label>Shipping Cost</label>
+        <div class="hint">What does shipping cost? Any free shipping thresholds?</div>
+        <input type="text" id="shipping_cost" placeholder="e.g. Free shipping on orders over $50, otherwise $4.99" />
+      </div>
+
+      <div class="form-group">
+        <label>Order Tracking</label>
         <div class="hint">How can customers track their orders?</div>
-        <input id="order_tracking" type="text" placeholder="e.g. A tracking link is sent to your email once shipped" />
+        <input type="text" id="order_tracking" placeholder="e.g. A tracking link is emailed once your order ships" />
       </div>
 
       <hr class="divider" />
-      <div class="section-title">Returns & Refunds</div>
 
-      <div class="row">
-        <label>Return policy</label>
+      <div class="form-group">
+        <label>Return Policy</label>
         <div class="hint">What is your returns policy?</div>
-        <input id="returns" type="text" placeholder="e.g. Returns accepted within 30 days of delivery" />
+        <input type="text" id="returns" placeholder="e.g. Returns accepted within 30 days of delivery" />
       </div>
 
-      <div class="row">
-        <label>Refund timeline</label>
-        <div class="hint">How long do refunds take after approval?</div>
-        <input id="refunds" type="text" placeholder="e.g. Refunds processed within 5–7 business days" />
+      <div class="form-group">
+        <label>Refund Timeline</label>
+        <div class="hint">How long do refunds take?</div>
+        <input type="text" id="refunds" placeholder="e.g. Refunds processed within 5-7 business days" />
       </div>
 
-      <hr class="divider" />
-      <div class="section-title">Support</div>
-
-      <div class="row">
-        <label>Customer support contact</label>
-        <div class="hint">Where should customers go if the AI can't help?</div>
-        <input id="support" type="text" placeholder="e.g. Email support@yourstore.com for further help" />
+      <div class="form-group">
+        <label>Current Promotions (Optional)</label>
+        <div class="hint">Any active discount codes or deals?</div>
+        <input type="text" id="promotions" placeholder="e.g. Use code SAVE10 for 10% off your first order" />
       </div>
 
-      <button type="submit" class="submit-btn" id="submitBtn">Save & Continue</button>
+      <div class="btn-row">
+        <button class="btn-back" onclick="prevStep(3)">← Back</button>
+        <button class="btn-next" onclick="nextStep(3)">Next: Hours →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: BUSINESS HOURS -->
+    <div class="step-content" id="step-4">
+      <div class="section-title">Business Hours</div>
+      <div class="section-subtitle">Let your assistant know when you're open so it can set accurate expectations.</div>
+
+      <div class="hours-grid" id="hoursGrid">
+        <!-- Generated by JS -->
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="prevStep(4)">← Back</button>
+        <button class="btn-next" onclick="nextStep(4)">Next: Support →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: SUPPORT -->
+    <div class="step-content" id="step-5">
+      <div class="section-title">Support & Escalation</div>
+      <div class="section-subtitle">What should your assistant do when it can't help a customer?</div>
+
+      <div class="form-group">
+        <label>Support Email</label>
+        <div class="hint">Where should customers go for issues the bot can't resolve?</div>
+        <input type="text" id="support_email" placeholder="e.g. support@yourstore.com" />
+      </div>
+
+      <div class="form-group">
+        <label>Support Phone (Optional)</label>
+        <div class="hint">Do you have a support phone number?</div>
+        <input type="text" id="support_phone" placeholder="e.g. +1 (800) 123-4567" />
+      </div>
+
+      <div class="form-group">
+        <label>Escalation Message</label>
+        <div class="hint">What should the bot say when it needs to hand off to a human?</div>
+        <input type="text" id="escalation" placeholder="e.g. For further help please email us at support@yourstore.com" />
+      </div>
+
+      <div class="form-group">
+        <label>Anything Else (Optional)</label>
+        <div class="hint">Any other information your assistant should know about your business?</div>
+        <textarea id="extra_info" placeholder="e.g. We are a family owned business based in New York. We specialize in handmade leather goods..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="prevStep(5)">← Back</button>
+        <button class="btn-next" id="saveBtn" onclick="saveSetup()">Save & Continue →</button>
+      </div>
+
       <div id="error" class="error"></div>
       <div id="success" class="success"></div>
+    </div>
 
-    </form>
   </div>
-
 </div>
 
 <script>
   const API_URL = "https://store-support-backend-v2.onrender.com";
   const token = localStorage.getItem("access_token");
 
-  // Redirect if not logged in
-  if (!token) {
-    window.location.href = "login.html";
+  if (!token) window.location.href = "login.html";
+
+  let currentStep = 1;
+  const totalSteps = 5;
+  let selectedPersonality = "";
+  let productMode = "structured";
+
+  // =========================
+  // BUSINESS HOURS SETUP
+  // =========================
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const hoursGrid = document.getElementById("hoursGrid");
+
+  days.forEach(day => {
+    const row = document.createElement("div");
+    row.className = "hours-row";
+    row.innerHTML = `
+      <label>${day}</label>
+      <input type="text" placeholder="Open e.g. 9:00 AM" id="open-${day}" />
+      <input type="text" placeholder="Close e.g. 6:00 PM" id="close-${day}" />
+      <label class="closed-toggle">
+        <input type="checkbox" id="closed-${day}" onchange="toggleClosed('${day}')" />
+        Closed
+      </label>
+    `;
+    hoursGrid.appendChild(row);
+  });
+
+  function toggleClosed(day) {
+    const closed = document.getElementById(`closed-${day}`).checked;
+    document.getElementById(`open-${day}`).disabled = closed;
+    document.getElementById(`close-${day}`).disabled = closed;
+    if (closed) {
+      document.getElementById(`open-${day}`).value = "";
+      document.getElementById(`close-${day}`).value = "";
+    }
   }
 
-  document.getElementById("setupForm").onsubmit = async (e) => {
-    e.preventDefault();
+  // =========================
+  // PERSONALITY SELECTION
+  // =========================
+  function selectPersonality(type) {
+    selectedPersonality = type;
+    document.querySelectorAll(".personality-card").forEach(c => c.classList.remove("selected"));
+    document.getElementById(`p-${type}`).classList.add("selected");
+  }
 
-    const shipping_time = document.getElementById("shipping_time").value.trim();
-    const order_tracking = document.getElementById("order_tracking").value.trim();
-    const returns = document.getElementById("returns").value.trim();
-    const refunds = document.getElementById("refunds").value.trim();
-    const support = document.getElementById("support").value.trim();
+  // =========================
+  // PRODUCT MODE
+  // =========================
+  function switchProductMode(mode) {
+    productMode = mode;
+    document.querySelectorAll(".product-tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".product-entry-mode").forEach(m => m.classList.remove("active"));
+    event.target.classList.add("active");
+    document.getElementById(`mode-${mode}`).classList.add("active");
+  }
 
-    if (!shipping_time || !order_tracking || !returns || !refunds || !support) {
-      document.getElementById("error").innerText = "Please fill in all fields before saving.";
+  function addProduct() {
+    const list = document.getElementById("productList");
+    const item = document.createElement("div");
+    item.className = "product-item";
+    item.innerHTML = `
+      <input type="text" placeholder="Product name" class="product-name" />
+      <input type="text" placeholder="Price e.g. $29" class="product-price" />
+      <input type="text" placeholder="Stock e.g. 50 units" class="product-stock" />
+      <button class="remove-btn" onclick="removeProduct(this)">×</button>
+    `;
+    list.appendChild(item);
+  }
+
+  function removeProduct(btn) {
+    const list = document.getElementById("productList");
+    if (list.children.length > 1) {
+      btn.parentElement.remove();
+    }
+  }
+
+  // =========================
+  // STEP NAVIGATION
+  // =========================
+  function nextStep(from) {
+    if (from === 1 && !selectedPersonality) {
+      alert("Please select a personality tone for your assistant.");
       return;
     }
 
-    // Build a clean prompt string for the AI
-    const businessData = `
-You are a helpful customer support assistant.
+    goToStep(from + 1);
+  }
 
-Shipping: ${shipping_time}
-Order Tracking: ${order_tracking}
-Returns: ${returns}
-Refunds: ${refunds}
-Support Contact: ${support}
+  function prevStep(from) {
+    goToStep(from - 1);
+  }
 
-Always be friendly, concise, and only answer based on the information above.
+  function goToStep(step) {
+    document.getElementById(`step-${currentStep}`).classList.remove("active");
+    document.getElementById(`dot-${currentStep}`).classList.remove("active");
+    document.getElementById(`dot-${currentStep}`).classList.add("completed");
+    document.getElementById(`dot-${currentStep}`).innerText = "✓";
+    document.getElementById(`label-${currentStep}`).classList.remove("active");
+
+    if (step < currentStep) {
+      document.getElementById(`dot-${currentStep}`).classList.remove("completed");
+      document.getElementById(`dot-${currentStep}`).innerText = currentStep;
+    }
+
+    currentStep = step;
+
+    document.getElementById(`step-${currentStep}`).classList.add("active");
+    document.getElementById(`dot-${currentStep}`).classList.remove("completed");
+    document.getElementById(`dot-${currentStep}`).classList.add("active");
+    document.getElementById(`dot-${currentStep}`).innerText = currentStep;
+    document.getElementById(`label-${currentStep}`).classList.add("active");
+
+    // Update progress fill
+    const percent = ((currentStep - 1) / (totalSteps - 1)) * 100;
+    document.getElementById("progressFill").style.width = `${percent}%`;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // =========================
+  // BUILD SYSTEM PROMPT
+  // =========================
+  function buildSystemPrompt() {
+    const botName = document.getElementById("bot_name").value.trim() || "Assistant";
+    const greeting = document.getElementById("greeting").value.trim();
+
+    const personalityMap = {
+      friendly: "You are friendly, warm and conversational. Use casual language and be approachable.",
+      professional: "You are professional, precise and formal. Use polished business language at all times.",
+      luxury: "You are sophisticated, refined and elegant. Speak with a premium, high-end tone that reflects luxury.",
+      calm: "You are calm, patient and empathetic. Be reassuring and supportive in all interactions."
+    };
+
+    const tone = personalityMap[selectedPersonality] || personalityMap.friendly;
+
+    // Products
+    let productsText = "";
+    if (productMode === "structured") {
+      const items = document.querySelectorAll(".product-item");
+      const productLines = [];
+      items.forEach(item => {
+        const name = item.querySelector(".product-name").value.trim();
+        const price = item.querySelector(".product-price").value.trim();
+        const stock = item.querySelector(".product-stock").value.trim();
+        if (name) productLines.push(`- ${name}${price ? `: ${price}` : ""}${stock ? ` (${stock})` : ""}`);
+      });
+      if (productLines.length > 0) productsText = `Products & Services:\n${productLines.join("\n")}`;
+    } else {
+      const ft = document.getElementById("products_freetext").value.trim();
+      if (ft) productsText = `Products & Services:\n${ft}`;
+    }
+
+    // Policies
+    const shippingTime = document.getElementById("shipping_time").value.trim();
+    const shippingCost = document.getElementById("shipping_cost").value.trim();
+    const orderTracking = document.getElementById("order_tracking").value.trim();
+    const returns = document.getElementById("returns").value.trim();
+    const refunds = document.getElementById("refunds").value.trim();
+    const promotions = document.getElementById("promotions").value.trim();
+
+    // Hours
+    const hoursLines = [];
+    days.forEach(day => {
+      const closed = document.getElementById(`closed-${day}`).checked;
+      const open = document.getElementById(`open-${day}`).value.trim();
+      const close = document.getElementById(`close-${day}`).value.trim();
+      if (closed) {
+        hoursLines.push(`${day}: Closed`);
+      } else if (open && close) {
+        hoursLines.push(`${day}: ${open} - ${close}`);
+      }
+    });
+
+    // Support
+    const supportEmail = document.getElementById("support_email").value.trim();
+    const supportPhone = document.getElementById("support_phone").value.trim();
+    const escalation = document.getElementById("escalation").value.trim();
+    const extraInfo = document.getElementById("extra_info").value.trim();
+
+    const prompt = `
+You are ${botName}, an AI customer support assistant. ${tone}
+${greeting ? `Your greeting message is: "${greeting}"` : ""}
+
+${productsText}
+
+${shippingTime ? `Shipping Time: ${shippingTime}` : ""}
+${shippingCost ? `Shipping Cost: ${shippingCost}` : ""}
+${orderTracking ? `Order Tracking: ${orderTracking}` : ""}
+${returns ? `Return Policy: ${returns}` : ""}
+${refunds ? `Refund Timeline: ${refunds}` : ""}
+${promotions ? `Current Promotions: ${promotions}` : ""}
+
+${hoursLines.length > 0 ? `Business Hours:\n${hoursLines.join("\n")}` : ""}
+
+${supportEmail ? `Support Email: ${supportEmail}` : ""}
+${supportPhone ? `Support Phone: ${supportPhone}` : ""}
+${escalation ? `Escalation: ${escalation}` : ""}
+${extraInfo ? `Additional Information: ${extraInfo}` : ""}
+
+Only answer questions based on the information provided above. If you don't know something, direct the customer to the support contact. Always stay in character and maintain your tone throughout the conversation.
     `.trim();
 
-    const submitBtn = document.getElementById("submitBtn");
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Saving...";
+    return prompt;
+  }
+
+  // =========================
+  // SAVE SETUP
+  // =========================
+  async function saveSetup() {
+    const supportEmail = document.getElementById("support_email").value.trim();
+    if (!supportEmail) {
+      document.getElementById("error").innerText = "Please enter a support email address.";
+      return;
+    }
+
+    const businessData = buildSystemPrompt();
+    const saveBtn = document.getElementById("saveBtn");
+    saveBtn.disabled = true;
+    saveBtn.innerText = "Saving...";
     document.getElementById("error").innerText = "";
 
     try {
@@ -255,9 +926,7 @@ Always be friendly, concise, and only answer based on the information above.
         body: JSON.stringify({ data: businessData })
       });
 
-      if (!res.ok) {
-        throw new Error("Save failed");
-      }
+      if (!res.ok) throw new Error("Save failed");
 
       document.getElementById("success").innerText = "Saved successfully! Redirecting...";
       setTimeout(() => {
@@ -266,10 +935,10 @@ Always be friendly, concise, and only answer based on the information above.
 
     } catch (err) {
       document.getElementById("error").innerText = "Failed to save. Please try again.";
-      submitBtn.disabled = false;
-      submitBtn.innerText = "Save & Continue";
+      saveBtn.disabled = false;
+      saveBtn.innerText = "Save & Continue →";
     }
-  };
+  }
 </script>
 
 </body>
