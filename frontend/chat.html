@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Relixo Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
     * {
       box-sizing: border-box;
@@ -13,32 +14,117 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f0f4ff;
+      background: #f0f4ff;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .back-link {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2563eb;
+      text-decoration: none;
+      background: white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+      transition: all 0.2s;
+      animation: fadeInDown 0.4s ease;
+    }
+
+    .back-link:hover {
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .chat-wrapper {
+      width: 100%;
+      max-width: 480px;
+      animation: slideUp 0.5s ease;
+    }
+
+    .chat-label {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .chat-label .logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2563eb;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .chat-label p {
+      font-size: 13px;
+      color: #9ca3af;
     }
 
     .chat-container {
-      width: 420px;
-      height: 650px;
+      width: 100%;
+      height: 620px;
       background: white;
-      border-radius: 16px;
+      border-radius: 20px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 40px rgba(37, 99, 235, 0.1);
       overflow: hidden;
     }
 
+    /* HEADER */
     .chat-header {
       background: #2563eb;
       color: white;
-      padding: 18px;
-      font-weight: 600;
-      font-size: 16px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
+    .chat-header .avatar {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .chat-header .info .name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .chat-header .info .status {
+      font-size: 12px;
+      color: #bfdbfe;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chat-header .info .status::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* MESSAGES */
     .messages {
       flex: 1;
       padding: 20px;
@@ -46,18 +132,34 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .messages::-webkit-scrollbar-thumb {
+      background: #e5e7eb;
+      border-radius: 99px;
     }
 
     .message {
-      max-width: 75%;
+      max-width: 78%;
       padding: 12px 16px;
       border-radius: 18px;
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 1.5;
+      animation: messageIn 0.3s ease;
     }
 
     .bot {
-      background: #e0e7ff;
+      background: #f0f4ff;
+      color: #111827;
       align-self: flex-start;
       border-bottom-left-radius: 4px;
     }
@@ -69,55 +171,200 @@
       border-bottom-right-radius: 4px;
     }
 
-    .typing {
-      font-style: italic;
-      font-size: 12px;
-      color: #666;
-      align-self: flex-start;
+    .message-time {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 4px;
+      display: block;
     }
 
+    .user .message-time {
+      text-align: right;
+      color: #bfdbfe;
+    }
+
+    /* TYPING INDICATOR */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 16px;
+      background: #f0f4ff;
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+      animation: messageIn 0.3s ease;
+    }
+
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+      background: #9ca3af;
+      border-radius: 50%;
+      animation: typingBounce 1.2s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    /* INPUT AREA */
     .input-area {
       display: flex;
-      border-top: 1px solid #e5e7eb;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid #f3f4f6;
+      background: white;
     }
 
     .input-area input {
       flex: 1;
-      padding: 14px;
-      border: none;
-      outline: none;
+      padding: 11px 16px;
       font-size: 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 99px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      color: #111827;
+      font-family: inherit;
     }
 
-    .input-area button {
-      padding: 0 20px;
-      border: none;
+    .input-area input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .input-area input::placeholder {
+      color: #9ca3af;
+    }
+
+    .send-btn {
+      width: 42px;
+      height: 42px;
       background: #2563eb;
       color: white;
+      border: none;
+      border-radius: 50%;
       cursor: pointer;
-      font-weight: 500;
-      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: background 0.2s, transform 0.1s;
+      flex-shrink: 0;
     }
 
-    .input-area button:hover {
+    .send-btn:hover {
       background: #1e40af;
     }
 
-    .input-area button:disabled {
-      opacity: 0.6;
+    .send-btn:active {
+      transform: scale(0.92);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    /* CHARACTER COUNT */
+    .char-count {
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: right;
+      padding: 0 16px 8px;
+    }
+
+    .char-count.warning {
+      color: #f59e0b;
+    }
+
+    /* POWERED BY */
+    .powered-by {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #9ca3af;
+      animation: fadeIn 0.5s ease 0.5s both;
+    }
+
+    .powered-by span {
+      color: #2563eb;
+      font-weight: 600;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes messageIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+
+    @media (max-width: 520px) {
+      .chat-container { height: 100vh; border-radius: 0; }
+      .back-link { top: 10px; left: 10px; }
     }
   </style>
 </head>
 <body>
 
-<div class="chat-container">
-  <div class="chat-header">Relixo Assistant</div>
-  <div class="messages" id="messages"></div>
-  <div class="input-area">
-    <input type="text" id="userInput" placeholder="Type your message..." />
-    <button id="sendBtn">Send</button>
+<a class="back-link" href="dashboard.html">← Dashboard</a>
+
+<div class="chat-wrapper">
+
+  <div class="chat-label">
+    <span class="logo">Relixo</span>
+    <p>Testing your AI assistant</p>
   </div>
+
+  <div class="chat-container">
+
+    <div class="chat-header">
+      <div class="avatar">🤖</div>
+      <div class="info">
+        <div class="name">Your AI Assistant</div>
+        <div class="status">Online</div>
+      </div>
+    </div>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="char-count" id="charCount"></div>
+
+    <div class="input-area">
+      <input
+        type="text"
+        id="userInput"
+        placeholder="Type your message..."
+        maxlength="500"
+        oninput="updateCharCount()"
+      />
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
+
+  </div>
+
+  <div class="powered-by">Powered by <span>Relixo</span></div>
+
 </div>
 
 <script>
@@ -128,26 +375,46 @@
   const input = document.getElementById("userInput");
   const sendBtn = document.getElementById("sendBtn");
 
-  if (!token) {
-    window.location.href = "login.html";
-  }
+  if (!token) window.location.href = "login.html";
 
+  // Welcome message
   addMessage("Hi 👋 Welcome! How can I assist you today?", "bot");
 
+  function getTime() {
+    return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
   function addMessage(text, sender) {
+    const wrapper = document.createElement("div");
+    wrapper.style.display = "flex";
+    wrapper.style.flexDirection = "column";
+    wrapper.style.alignItems = sender === "user" ? "flex-end" : "flex-start";
+
     const msg = document.createElement("div");
     msg.classList.add("message", sender);
     msg.innerText = text;
-    messagesDiv.appendChild(msg);
+
+    const time = document.createElement("span");
+    time.classList.add("message-time");
+    if (sender === "user") time.classList.add("user");
+    time.innerText = getTime();
+
+    wrapper.appendChild(msg);
+    wrapper.appendChild(time);
+    messagesDiv.appendChild(wrapper);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
   function showTyping() {
-    const typing = document.createElement("div");
-    typing.className = "typing";
-    typing.id = "typing";
-    typing.innerText = "Bot is typing…";
-    messagesDiv.appendChild(typing);
+    const indicator = document.createElement("div");
+    indicator.className = "typing-indicator";
+    indicator.id = "typing";
+    indicator.innerHTML = `
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    `;
+    messagesDiv.appendChild(indicator);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
@@ -156,14 +423,26 @@
     if (typing) typing.remove();
   }
 
+  function updateCharCount() {
+    const len = input.value.length;
+    const countEl = document.getElementById("charCount");
+    if (len > 400) {
+      countEl.innerText = `${len}/500`;
+      countEl.classList.add("warning");
+    } else {
+      countEl.innerText = "";
+      countEl.classList.remove("warning");
+    }
+  }
+
   async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
 
     addMessage(text, "user");
     input.value = "";
+    updateCharCount();
     sendBtn.disabled = true;
-
     showTyping();
 
     try {
@@ -182,7 +461,7 @@
 
     } catch (error) {
       removeTyping();
-      addMessage("Error connecting to server.", "bot");
+      addMessage("Error connecting to server. Please try again.", "bot");
     }
 
     sendBtn.disabled = false;
