@@ -377,8 +377,10 @@
 
   if (!token) window.location.href = "login.html";
 
-  // Welcome message
+  // Welcome message — only show once
+if (messagesDiv.children.length === 0) {
   addMessage("Hi 👋 Welcome! How can I assist you today?", "bot");
+}
 
   function getTime() {
     return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });

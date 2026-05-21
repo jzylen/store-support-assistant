@@ -462,7 +462,9 @@
           </div>
         `;
       } else {
-        addMessage("Hi 👋 How can I help you today?", "bot");
+       if (messagesDiv.children.length === 0) {
+  addMessage("Hi 👋 How can I help you today?", "bot");
+}
       }
       openedOnce = true;
     }
