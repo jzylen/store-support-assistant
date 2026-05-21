@@ -80,7 +80,6 @@
       overflow: hidden;
     }
 
-    /* HEADER */
     .chat-header {
       background: #2563eb;
       color: white;
@@ -88,6 +87,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      flex-shrink: 0;
     }
 
     .chat-header .avatar {
@@ -124,7 +124,6 @@
       display: inline-block;
     }
 
-    /* MESSAGES */
     .messages {
       flex: 1;
       padding: 20px;
@@ -183,7 +182,6 @@
       color: #bfdbfe;
     }
 
-    /* TYPING INDICATOR */
     .typing-indicator {
       display: flex;
       align-items: center;
@@ -207,7 +205,6 @@
     .typing-dot:nth-child(2) { animation-delay: 0.2s; }
     .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
-    /* INPUT AREA */
     .input-area {
       display: flex;
       align-items: center;
@@ -215,6 +212,7 @@
       padding: 14px 16px;
       border-top: 1px solid #f3f4f6;
       background: white;
+      flex-shrink: 0;
     }
 
     .input-area input {
@@ -267,19 +265,18 @@
       cursor: not-allowed;
     }
 
-    /* CHARACTER COUNT */
     .char-count {
       font-size: 11px;
       color: #9ca3af;
       text-align: right;
       padding: 0 16px 8px;
+      flex-shrink: 0;
     }
 
     .char-count.warning {
       color: #f59e0b;
     }
 
-    /* POWERED BY */
     .powered-by {
       text-align: center;
       margin-top: 12px;
@@ -293,7 +290,6 @@
       font-weight: 600;
     }
 
-    /* ANIMATIONS */
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -330,14 +326,12 @@
 <a class="back-link" href="dashboard.html">← Dashboard</a>
 
 <div class="chat-wrapper">
-
   <div class="chat-label">
     <span class="logo">Relixo</span>
     <p>Testing your AI assistant</p>
   </div>
 
   <div class="chat-container">
-
     <div class="chat-header">
       <div class="avatar">🤖</div>
       <div class="info">
@@ -347,7 +341,6 @@
     </div>
 
     <div class="messages" id="messages"></div>
-
     <div class="char-count" id="charCount"></div>
 
     <div class="input-area">
@@ -358,13 +351,11 @@
         maxlength="500"
         oninput="updateCharCount()"
       />
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+      <button class="send-btn" id="sendBtn">➤</button>
     </div>
-
   </div>
 
   <div class="powered-by">Powered by <span>Relixo</span></div>
-
 </div>
 
 <script>
@@ -376,11 +367,6 @@
   const sendBtn = document.getElementById("sendBtn");
 
   if (!token) window.location.href = "login.html";
-
-  // Welcome message — only show once
-if (messagesDiv.children.length === 0) {
-  addMessage("Hi 👋 Welcome! How can I assist you today?", "bot");
-}
 
   function getTime() {
     return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -475,6 +461,11 @@ if (messagesDiv.children.length === 0) {
   input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendMessage();
   });
+
+  // Welcome message — only add once at the bottom after all functions are defined
+  if (messagesDiv.children.length === 0) {
+    addMessage("Hi 👋 Welcome! How can I assist you today?", "bot");
+  }
 </script>
 
 </body>

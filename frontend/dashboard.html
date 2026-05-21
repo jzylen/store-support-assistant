@@ -18,7 +18,6 @@
       min-height: 100vh;
     }
 
-    /* NAVBAR */
     .navbar {
       background: white;
       border-bottom: 1px solid #e5e7eb;
@@ -74,7 +73,6 @@
       border-color: #1e40af;
     }
 
-    /* MAIN */
     .container {
       max-width: 1000px;
       margin: 40px auto;
@@ -96,7 +94,6 @@
       animation: fadeInUp 0.4s ease 0.2s both;
     }
 
-    /* TRIAL BANNER */
     .trial-banner {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
@@ -105,12 +102,10 @@
       font-size: 13px;
       color: #1d4ed8;
       margin-bottom: 28px;
-      display: none;
       animation: fadeIn 0.4s ease;
       display: none;
     }
 
-    /* STAT CARDS */
     .card-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -168,7 +163,6 @@
     .badge.expired { background: #fee2e2; color: #dc2626; }
     .badge.inactive { background: #f3f4f6; color: #6b7280; }
 
-    /* USAGE BAR */
     .usage-card {
       background: white;
       border-radius: 14px;
@@ -211,10 +205,9 @@
       color: #6b7280;
     }
 
-    /* QUICK ACTIONS */
     .actions-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
       margin-bottom: 24px;
     }
@@ -235,6 +228,7 @@
     .action-card:nth-child(1) { animation-delay: 0.6s; }
     .action-card:nth-child(2) { animation-delay: 0.7s; }
     .action-card:nth-child(3) { animation-delay: 0.8s; }
+    .action-card:nth-child(4) { animation-delay: 0.9s; }
 
     .action-card:hover {
       box-shadow: 0 8px 30px rgba(37, 99, 235, 0.12);
@@ -258,7 +252,6 @@
       color: #9ca3af;
     }
 
-    /* UPGRADE CARD */
     .upgrade-card {
       background: #2563eb;
       border-radius: 14px;
@@ -268,7 +261,7 @@
       justify-content: space-between;
       box-shadow: 0 4px 24px rgba(37, 99, 235, 0.2);
       opacity: 0;
-      animation: fadeInUp 0.4s ease 0.9s forwards;
+      animation: fadeInUp 0.4s ease 1s forwards;
     }
 
     .upgrade-text h3 {
@@ -302,7 +295,6 @@
       transform: scale(1.02);
     }
 
-    /* SKELETON LOADER */
     .skeleton {
       background: linear-gradient(90deg, #f0f4ff 25%, #e0e7ff 50%, #f0f4ff 75%);
       background-size: 200% 100%;
@@ -317,7 +309,6 @@
       100% { background-position: -200% 0; }
     }
 
-    /* ANIMATIONS */
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -335,7 +326,7 @@
 
     @media (max-width: 700px) {
       .card-grid { grid-template-columns: repeat(2, 1fr); }
-      .actions-grid { grid-template-columns: 1fr; }
+      .actions-grid { grid-template-columns: repeat(2, 1fr); }
       .upgrade-card {
         flex-direction: column;
         gap: 16px;
@@ -350,7 +341,6 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar">
   <span class="logo">Relixo</span>
   <div class="nav-right">
@@ -360,16 +350,13 @@
   </div>
 </nav>
 
-<!-- MAIN -->
 <div class="container">
 
-  <p class="page-title" id="pageTitle">Dashboard</p>
+  <p class="page-title">Dashboard</p>
   <p class="page-subtitle">Welcome back! Here's an overview of your account.</p>
 
-  <!-- TRIAL BANNER -->
   <div class="trial-banner" id="trialBanner"></div>
 
-  <!-- STAT CARDS -->
   <div class="card-grid">
     <div class="stat-card">
       <div class="stat-label">Current Plan</div>
@@ -389,7 +376,6 @@
     </div>
   </div>
 
-  <!-- USAGE BAR -->
   <div class="usage-card">
     <h3>Message Usage This Month</h3>
     <div class="usage-bar-bg">
@@ -398,7 +384,6 @@
     <div class="usage-label" id="usageLabel">Loading...</div>
   </div>
 
-  <!-- QUICK ACTIONS -->
   <div class="actions-grid">
     <a class="action-card" href="setup.html">
       <div class="action-icon">⚙️</div>
@@ -410,6 +395,11 @@
       <div class="action-title">Test Chat</div>
       <div class="action-desc">Preview how your AI assistant responds</div>
     </a>
+    <a class="action-card" href="#" id="widgetTestLink">
+      <div class="action-icon">🔧</div>
+      <div class="action-title">Test Widget</div>
+      <div class="action-desc">Preview the embeddable widget with your business ID</div>
+    </a>
     <a class="action-card" href="pricing.html">
       <div class="action-icon">🚀</div>
       <div class="action-title">Upgrade Plan</div>
@@ -417,7 +407,6 @@
     </a>
   </div>
 
-  <!-- UPGRADE CARD -->
   <div class="upgrade-card">
     <div class="upgrade-text">
       <h3>Ready to grow?</h3>
@@ -446,7 +435,6 @@
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  // Animate number counting up
   function animateCount(el, target) {
     let start = 0;
     const duration = 800;
@@ -463,26 +451,32 @@
 
   async function loadUsage() {
     try {
-      const res = await fetch(`${API_URL}/business/usage`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
+      // Load usage and business ID in parallel
+      const [usageRes, idRes] = await Promise.all([
+        fetch(`${API_URL}/business/usage`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        }),
+        fetch(`${API_URL}/business/id`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        })
+      ]);
 
-      if (!res.ok) throw new Error("Failed to load");
+      const data = await usageRes.json();
+      const idData = await idRes.json();
 
-      const data = await res.json();
-
-      // Page title with business name if available
-      document.getElementById("pageTitle").innerText = "Dashboard";
+      // Set widget test link with business ID
+      document.getElementById("widgetTestLink").href =
+        `widget.html?business_id=${idData.business_id}`;
 
       // Plan
       document.getElementById("plan").innerText = capitalize(data.plan);
 
-      // Messages used — animated count
+      // Messages used
       const usedEl = document.getElementById("used");
       usedEl.innerText = "0";
       animateCount(usedEl, data.message_count);
 
-      // Limit — animated count
+      // Limit
       const limitEl = document.getElementById("limit");
       limitEl.innerText = "0";
       animateCount(limitEl, data.limit);
@@ -492,7 +486,7 @@
       document.getElementById("status").innerHTML =
         `<span class="badge ${status}">${capitalize(status)}</span>`;
 
-      // Usage bar — animate after short delay
+      // Usage bar
       setTimeout(() => {
         const percent = Math.min((data.message_count / data.limit) * 100, 100);
         const bar = document.getElementById("usageBar");
