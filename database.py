@@ -17,8 +17,12 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
+    # Temporarily dropping to recreate with new columns
+    cursor.execute("DROP TABLE IF EXISTS users CASCADE;")
+    cursor.execute("DROP TABLE IF EXISTS businesses CASCADE;")
+
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS businesses (
+        CREATE TABLE businesses (
             id TEXT PRIMARY KEY,
             name TEXT,
             data TEXT,
@@ -33,7 +37,7 @@ def init_db():
     """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE users (
             id SERIAL PRIMARY KEY,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
