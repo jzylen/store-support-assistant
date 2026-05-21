@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Online Store Support Demo</title>
+  <title>Relixo — AI Customer Support Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -18,161 +18,421 @@
       color: #111827;
     }
 
-    header {
+    /* NAVBAR */
+    .navbar {
       background: white;
       border-bottom: 1px solid #e5e7eb;
-      padding: 16px 32px;
+      padding: 0 32px;
+      height: 60px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05);
+      animation: fadeInDown 0.4s ease;
     }
 
-    header .logo {
+    .navbar .logo {
       font-size: 20px;
       font-weight: 700;
       color: #2563eb;
     }
 
-    header a {
-      font-size: 14px;
-      color: #2563eb;
-      text-decoration: none;
-      font-weight: 500;
+    .navbar .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
 
+    .navbar a {
+      font-size: 13px;
+      color: #6b7280;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .navbar a:hover {
+      color: #2563eb;
+    }
+
+    .navbar .cta-nav {
+      background: #2563eb;
+      color: white !important;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 600 !important;
+      transition: background 0.2s !important;
+    }
+
+    .navbar .cta-nav:hover {
+      background: #1e40af;
+      color: white !important;
+    }
+
+    /* HERO */
     .hero {
       text-align: center;
-      padding: 70px 20px 50px;
+      padding: 80px 20px 60px;
+    }
+
+    .hero .badge {
+      display: inline-block;
+      background: #dbeafe;
+      color: #2563eb;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.5s ease 0.1s both;
     }
 
     .hero h1 {
-      font-size: 36px;
+      font-size: 42px;
       font-weight: 800;
       color: #111827;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       line-height: 1.2;
+      animation: fadeInUp 0.5s ease 0.2s both;
+    }
+
+    .hero h1 span {
+      color: #2563eb;
     }
 
     .hero p {
-      font-size: 17px;
+      font-size: 18px;
       color: #6b7280;
       max-width: 580px;
-      margin: 0 auto 28px;
-      line-height: 1.6;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+      animation: fadeInUp 0.5s ease 0.3s both;
     }
 
-    .hero .cta-btn {
+    .hero-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.5s ease 0.4s both;
+    }
+
+    .hero-btns .btn-primary {
       background: #2563eb;
       color: white;
       border: none;
-      padding: 13px 28px;
+      padding: 14px 28px;
       border-radius: 8px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
       text-decoration: none;
       display: inline-block;
     }
 
-    .hero .cta-btn:hover {
+    .hero-btns .btn-primary:hover {
       background: #1e40af;
+      transform: translateY(-1px);
     }
 
-    .section {
-      padding: 40px 20px 60px;
-      max-width: 900px;
+    .hero-btns .btn-secondary {
+      background: white;
+      color: #2563eb;
+      border: 1.5px solid #2563eb;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .hero-btns .btn-secondary:hover {
+      background: #eff6ff;
+      transform: translateY(-1px);
+    }
+
+    /* STATS */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      padding: 40px 20px;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      border-bottom: 1px solid #e5e7eb;
+      flex-wrap: wrap;
+      animation: fadeIn 0.5s ease 0.5s both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat .number {
+      font-size: 28px;
+      font-weight: 800;
+      color: #2563eb;
+      margin-bottom: 4px;
+    }
+
+    .stat .label {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    /* FEATURES */
+    .features-section {
+      max-width: 960px;
       margin: 0 auto;
+      padding: 70px 20px;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2563eb;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+      animation: fadeInUp 0.5s ease both;
     }
 
     .section-title {
       text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      color: #2563eb;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 24px;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .feature {
-      background: white;
-      padding: 24px;
-      border-radius: 14px;
-      box-shadow: 0 4px 24px rgba(37, 99, 235, 0.07);
-    }
-
-    .feature h3 {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 8px;
+      font-size: 28px;
+      font-weight: 800;
       color: #111827;
+      margin-bottom: 48px;
+      animation: fadeInUp 0.5s ease 0.1s both;
     }
 
-    .feature p {
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(37, 99, 235, 0.07);
+      transition: transform 0.2s, box-shadow 0.2s;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    .feature-card:nth-child(1) { animation-delay: 0.1s; }
+    .feature-card:nth-child(2) { animation-delay: 0.2s; }
+    .feature-card:nth-child(3) { animation-delay: 0.3s; }
+    .feature-card:nth-child(4) { animation-delay: 0.4s; }
+    .feature-card:nth-child(5) { animation-delay: 0.5s; }
+    .feature-card:nth-child(6) { animation-delay: 0.6s; }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(37, 99, 235, 0.12);
+    }
+
+    .feature-card .icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .feature-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
       font-size: 13px;
       color: #6b7280;
-      font-style: italic;
+      line-height: 1.6;
     }
 
-    footer {
+    /* HOW IT WORKS */
+    .how-section {
+      background: white;
+      padding: 70px 20px;
+      border-top: 1px solid #e5e7eb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .how-steps {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .how-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      opacity: 0;
+      animation: fadeInLeft 0.5s ease forwards;
+    }
+
+    .how-step:nth-child(1) { animation-delay: 0.1s; }
+    .how-step:nth-child(2) { animation-delay: 0.2s; }
+    .how-step:nth-child(3) { animation-delay: 0.3s; }
+
+    .how-step .step-num {
+      width: 44px;
+      height: 44px;
+      background: #2563eb;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .how-step .step-content h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+
+    .how-step .step-content p {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
       text-align: center;
-      padding: 30px;
+      padding: 80px 20px;
+      animation: fadeInUp 0.5s ease both;
+    }
+
+    .cta-section h2 {
+      font-size: 30px;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 16px;
+    }
+
+    .cta-section p {
+      font-size: 16px;
+      color: #6b7280;
+      margin-bottom: 32px;
+    }
+
+    /* FOOTER */
+    footer {
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       font-size: 13px;
       color: #9ca3af;
-      border-top: 1px solid #e5e7eb;
-      background: white;
+    }
+
+    footer .logo {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2563eb;
     }
 
     /* CHAT WIDGET */
     #chat-toggle {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: 24px;
+      right: 24px;
       background: #2563eb;
       color: white;
       border-radius: 50%;
-      width: 56px;
-      height: 56px;
+      width: 60px;
+      height: 60px;
       border: none;
       cursor: pointer;
-      font-size: 24px;
+      font-size: 26px;
       z-index: 9999;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-      transition: background 0.2s;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+      transition: background 0.2s, transform 0.2s;
+      animation: bounceIn 0.6s ease 1s both;
     }
 
     #chat-toggle:hover {
       background: #1e40af;
+      transform: scale(1.08);
     }
 
     #chat-box {
       position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 340px;
-      height: 460px;
+      bottom: 100px;
+      right: 24px;
+      width: 360px;
+      height: 500px;
       background: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
       display: none;
       flex-direction: column;
       z-index: 9999;
       overflow: hidden;
+      animation: slideUp 0.3s ease;
     }
 
     #chat-header {
       background: #2563eb;
       color: white;
-      padding: 16px;
-      font-weight: 600;
-      font-size: 15px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #chat-header .avatar {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    #chat-header .info .name {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    #chat-header .info .status {
+      font-size: 11px;
+      color: #bfdbfe;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #chat-header .info .status::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      background: #4ade80;
+      border-radius: 50%;
+      display: inline-block;
     }
 
     #chat-messages {
@@ -182,6 +442,16 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      scroll-behavior: smooth;
+    }
+
+    #chat-messages::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    #chat-messages::-webkit-scrollbar-thumb {
+      background: #e5e7eb;
+      border-radius: 99px;
     }
 
     .message {
@@ -190,6 +460,7 @@
       border-radius: 16px;
       font-size: 14px;
       line-height: 1.4;
+      animation: messageIn 0.3s ease;
     }
 
     .user {
@@ -201,89 +472,275 @@
 
     .bot {
       margin-right: auto;
-      background: #e0e7ff;
+      background: #f0f4ff;
       color: #111827;
       border-bottom-left-radius: 4px;
     }
 
-    .typing {
-      font-style: italic;
-      font-size: 12px;
-      color: #9ca3af;
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 14px;
+      background: #f0f4ff;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+      animation: messageIn 0.3s ease;
     }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: #9ca3af;
+      border-radius: 50%;
+      animation: typingBounce 1.2s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
     #chat-input {
       display: flex;
-      border-top: 1px solid #e5e7eb;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      border-top: 1px solid #f3f4f6;
     }
 
     #chat-input input {
       flex: 1;
-      padding: 12px 14px;
-      border: none;
-      outline: none;
+      padding: 10px 14px;
       font-size: 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 99px;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    #chat-input input:focus {
+      border-color: #2563eb;
     }
 
     #chat-input button {
-      padding: 0 16px;
+      width: 38px;
+      height: 38px;
       background: #2563eb;
       color: white;
       border: none;
+      border-radius: 50%;
       cursor: pointer;
-      font-weight: 600;
-      font-size: 13px;
-      transition: background 0.2s;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.1s;
+      flex-shrink: 0;
     }
 
     #chat-input button:hover {
       background: #1e40af;
     }
+
+    #chat-input button:active {
+      transform: scale(0.92);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-16px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes messageIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.3); }
+      50% { transform: scale(1.15); }
+      70% { transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @media (max-width: 700px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 28px; }
+      .stats { gap: 24px; }
+      #chat-box { width: calc(100vw - 48px); }
+    }
   </style>
 </head>
 <body>
 
-<header>
+<!-- NAVBAR -->
+<nav class="navbar">
   <span class="logo">Relixo</span>
-  <a href="create.html">Get Started →</a>
-</header>
+  <div class="nav-links">
+    <a href="pricing.html">Pricing</a>
+    <a href="login.html">Log in</a>
+    <a href="create.html" class="cta-nav">Start Free Trial</a>
+  </div>
+</nav>
 
+<!-- HERO -->
 <div class="hero">
-  <h1>AI Customer Support,<br/>Built for Your Business</h1>
-  <p>Instantly answer customer questions about shipping, returns, and orders — 24/7, without lifting a finger.</p>
-  <a href="create.html" class="cta-btn">Start Free Trial</a>
+  <div class="badge">🤖 AI-Powered Customer Support</div>
+  <h1>Your business deserves an assistant<br/>that never <span>sleeps</span></h1>
+  <p>Give your customers instant, accurate answers 24/7. Relixo learns your business and handles support so you don't have to.</p>
+  <div class="hero-btns">
+    <a href="create.html" class="btn-primary">Start Free Trial →</a>
+    <a href="#demo" class="btn-secondary">See it in action ↓</a>
+  </div>
 </div>
 
-<section class="section">
-  <div class="section-title">What your assistant can handle</div>
-  <div class="features">
-    <div class="feature">
-      <h3>📦 Shipping Questions</h3>
-      <p>"How long does shipping take?"</p>
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="number">24/7</div>
+    <div class="label">Always available</div>
+  </div>
+  <div class="stat">
+    <div class="number">&lt;1s</div>
+    <div class="label">Response time</div>
+  </div>
+  <div class="stat">
+    <div class="number">7 days</div>
+    <div class="label">Free trial</div>
+  </div>
+  <div class="stat">
+    <div class="number">Any site</div>
+    <div class="label">Easy embed</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="section-label">Features</div>
+  <div class="section-title">Everything your business needs</div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="icon">🎨</div>
+      <h3>Custom Personality</h3>
+      <p>Give your assistant a name and tone that matches your brand — friendly, professional, luxury or calm.</p>
     </div>
-    <div class="feature">
-      <h3>🔎 Order Tracking</h3>
-      <p>"How do I track my order?"</p>
+    <div class="feature-card">
+      <div class="icon">📦</div>
+      <h3>Product Knowledge</h3>
+      <p>Your assistant knows your products, prices and stock levels so it can answer accurately every time.</p>
     </div>
-    <div class="feature">
-      <h3>↩️ Returns & Refunds</h3>
-      <p>"What's your return policy?"</p>
+    <div class="feature-card">
+      <div class="icon">🌍</div>
+      <h3>Multilingual</h3>
+      <p>Automatically responds in your customer's language with no extra setup required.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⚡</div>
+      <h3>Instant Responses</h3>
+      <p>Customers get answers in under a second, any time of day, without waiting for a human.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔗</div>
+      <h3>Easy Embed</h3>
+      <p>Add the widget to any website with one line of code. Works with Shopify, WordPress, Wix and more.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📊</div>
+      <h3>Usage Dashboard</h3>
+      <p>Track how many messages your assistant handles each month with a clear, visual dashboard.</p>
     </div>
   </div>
 </section>
 
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="section-label" style="text-align:center; margin-bottom:16px;">How it works</div>
+  <div class="section-title">Up and running in minutes</div>
+
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Create your account</h3>
+        <p>Sign up for free in seconds. No credit card required to start your 7-day trial.</p>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Configure your assistant</h3>
+        <p>Tell your assistant about your business — products, policies, hours and personality. Our step by step wizard makes it easy.</p>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Embed on your website</h3>
+        <p>Copy one line of code and paste it into your website. Your AI assistant is instantly live for your customers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="demo">
+  <h2>See it in action below 👇</h2>
+  <p>Click the chat button in the bottom right to try a live demo of the AI assistant.</p>
+  <a href="create.html" class="btn-primary" style="display:inline-block; text-decoration:none; padding: 14px 28px; background: #2563eb; color: white; border-radius: 8px; font-size: 15px; font-weight: 600;">
+    Start Your Free Trial →
+  </a>
+</section>
+
+<!-- FOOTER -->
 <footer>
-  Live demo • Powered by Relixo
+  <span class="logo">Relixo</span>
+  <span>© 2026 Relixo. All rights reserved.</span>
+  <a href="pricing.html" style="color: #9ca3af; text-decoration: none;">Pricing</a>
 </footer>
 
+<!-- CHAT WIDGET -->
 <button id="chat-toggle">💬</button>
 
 <div id="chat-box">
-  <div id="chat-header">Chat with store support</div>
+  <div id="chat-header">
+    <div class="avatar">🤖</div>
+    <div class="info">
+      <div class="name">Relixo Demo</div>
+      <div class="status">Online</div>
+    </div>
+  </div>
   <div id="chat-messages"></div>
   <div id="chat-input">
-    <input id="messageInput" placeholder="Ask about shipping, returns, or orders…" />
-    <button onclick="sendMessage()">Send</button>
+    <input id="messageInput" placeholder="Ask about shipping, returns..." />
+    <button onclick="sendMessage()">➤</button>
   </div>
 </div>
 
@@ -295,14 +752,20 @@
   const messages = document.getElementById("chat-messages");
   const input = document.getElementById("messageInput");
 
+  let openedOnce = false;
+
   toggle.onclick = () => {
-    box.style.display = box.style.display === "flex" ? "none" : "flex";
-    if (messages.children.length === 0) {
-      addMessage("Hi 👋 I can help with shipping, order tracking, returns, and refunds.", "bot");
+    const isOpen = box.style.display === "flex";
+    box.style.display = isOpen ? "none" : "flex";
+    toggle.innerText = isOpen ? "💬" : "✕";
+
+    if (!openedOnce && !isOpen) {
+      addMessage("Hi 👋 I'm a demo assistant for an online store. Ask me about shipping, returns or orders!", "bot");
+      openedOnce = true;
     }
   };
 
-  input.addEventListener("keydown", (e) => {
+  input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendMessage();
   });
 
@@ -314,19 +777,31 @@
     messages.scrollTop = messages.scrollHeight;
   }
 
+  function showTyping() {
+    const indicator = document.createElement("div");
+    indicator.className = "typing-indicator";
+    indicator.id = "typing";
+    indicator.innerHTML = `
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    `;
+    messages.appendChild(indicator);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function removeTyping() {
+    const typing = document.getElementById("typing");
+    if (typing) typing.remove();
+  }
+
   async function sendMessage() {
     const msg = input.value.trim();
     if (!msg) return;
 
     addMessage(msg, "user");
     input.value = "";
-
-    const typing = document.createElement("div");
-    typing.className = "typing";
-    typing.id = "typing";
-    typing.innerText = "Typing...";
-    messages.appendChild(typing);
-    messages.scrollTop = messages.scrollHeight;
+    showTyping();
 
     try {
       const res = await fetch(`${API_URL}/demo/chat`, {
@@ -336,11 +811,11 @@
       });
 
       const data = await res.json();
-      document.getElementById("typing").remove();
+      removeTyping();
       addMessage(data.reply || "No response", "bot");
 
     } catch (error) {
-      document.getElementById("typing").remove();
+      removeTyping();
       addMessage("Something went wrong. Please try again.", "bot");
     }
   }
