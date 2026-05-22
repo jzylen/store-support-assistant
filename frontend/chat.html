@@ -134,18 +134,9 @@
       scroll-behavior: smooth;
     }
 
-    .messages::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .messages::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .messages::-webkit-scrollbar-thumb {
-      background: #e5e7eb;
-      border-radius: 99px;
-    }
+    .messages::-webkit-scrollbar { width: 4px; }
+    .messages::-webkit-scrollbar-track { background: transparent; }
+    .messages::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }
 
     .message {
       max-width: 78%;
@@ -232,9 +223,7 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
-    .input-area input::placeholder {
-      color: #9ca3af;
-    }
+    .input-area input::placeholder { color: #9ca3af; }
 
     .send-btn {
       width: 42px;
@@ -252,18 +241,9 @@
       flex-shrink: 0;
     }
 
-    .send-btn:hover {
-      background: #1e40af;
-    }
-
-    .send-btn:active {
-      transform: scale(0.92);
-    }
-
-    .send-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .send-btn:hover { background: #1e40af; }
+    .send-btn:active { transform: scale(0.92); }
+    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .char-count {
       font-size: 11px;
@@ -273,43 +253,21 @@
       flex-shrink: 0;
     }
 
-    .char-count.warning {
-      color: #f59e0b;
-    }
+    .char-count.warning { color: #f59e0b; }
 
     .powered-by {
       text-align: center;
       margin-top: 12px;
       font-size: 12px;
       color: #9ca3af;
-      animation: fadeIn 0.5s ease 0.5s both;
     }
 
-    .powered-by span {
-      color: #2563eb;
-      font-weight: 600;
-    }
+    .powered-by span { color: #2563eb; font-weight: 600; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes messageIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes messageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes typingBounce {
       0%, 60%, 100% { transform: translateY(0); }
       30% { transform: translateY(-6px); }
@@ -365,6 +323,9 @@
   const messagesDiv = document.getElementById("messages");
   const input = document.getElementById("userInput");
   const sendBtn = document.getElementById("sendBtn");
+
+  // Conversation history stored in memory
+  const conversationHistory = [];
 
   if (!token) window.location.href = "login.html";
 
@@ -440,12 +401,26 @@
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ message: text })
+        body: JSON.stringify({
+          message: text,
+          history: conversationHistory
+        })
       });
 
       const data = await response.json();
       removeTyping();
-      addMessage(data.reply || "No response", "bot");
+
+      const reply = data.reply || "No response";
+      addMessage(reply, "bot");
+
+      // Add to history after successful response
+      conversationHistory.push({ role: "user", content: text });
+      conversationHistory.push({ role: "assistant", content: reply });
+
+      // Keep history capped at last 20 messages
+      if (conversationHistory.length > 20) {
+        conversationHistory.splice(0, 2);
+      }
 
     } catch (error) {
       removeTyping();
@@ -462,7 +437,7 @@
     if (e.key === "Enter") sendMessage();
   });
 
-  // Welcome message — only add once at the bottom after all functions are defined
+  // Welcome message — only once after all functions defined
   if (messagesDiv.children.length === 0) {
     addMessage("Hi 👋 Welcome! How can I assist you today?", "bot");
   }

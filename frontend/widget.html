@@ -18,7 +18,6 @@
       overflow: hidden;
     }
 
-    /* TOGGLE BUTTON */
     #chat-toggle {
       position: fixed;
       bottom: 20px;
@@ -40,16 +39,9 @@
       animation: bounceIn 0.6s ease both;
     }
 
-    #chat-toggle:hover {
-      background: #1e40af;
-      transform: scale(1.08);
-    }
+    #chat-toggle:hover { background: #1e40af; transform: scale(1.08); }
+    #chat-toggle:active { transform: scale(0.95); }
 
-    #chat-toggle:active {
-      transform: scale(0.95);
-    }
-
-    /* NOTIFICATION DOT */
     #notification-dot {
       position: fixed;
       bottom: 68px;
@@ -64,7 +56,6 @@
       display: none;
     }
 
-    /* CHAT BOX */
     #chat-box {
       position: fixed;
       bottom: 92px;
@@ -85,7 +76,6 @@
       animation: slideUp 0.3s ease;
     }
 
-    /* HEADER */
     #chat-header {
       background: #2563eb;
       color: white;
@@ -108,15 +98,8 @@
       flex-shrink: 0;
     }
 
-    .header-info {
-      flex: 1;
-    }
-
-    .header-name {
-      font-weight: 700;
-      font-size: 14px;
-      margin-bottom: 2px;
-    }
+    .header-info { flex: 1; }
+    .header-name { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
 
     .header-status {
       font-size: 11px;
@@ -151,11 +134,8 @@
       flex-shrink: 0;
     }
 
-    .header-close:hover {
-      background: rgba(255,255,255,0.25);
-    }
+    .header-close:hover { background: rgba(255,255,255,0.25); }
 
-    /* MESSAGES */
     #chat-messages {
       flex: 1;
       padding: 16px;
@@ -166,14 +146,8 @@
       scroll-behavior: smooth;
     }
 
-    #chat-messages::-webkit-scrollbar {
-      width: 3px;
-    }
-
-    #chat-messages::-webkit-scrollbar-thumb {
-      background: #e5e7eb;
-      border-radius: 99px;
-    }
+    #chat-messages::-webkit-scrollbar { width: 3px; }
+    #chat-messages::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }
 
     .message {
       max-width: 82%;
@@ -206,12 +180,8 @@
       display: block;
     }
 
-    .user .message-time {
-      text-align: right;
-      color: rgba(255,255,255,0.6);
-    }
+    .user .message-time { text-align: right; color: rgba(255,255,255,0.6); }
 
-    /* TYPING INDICATOR */
     .typing-indicator {
       display: flex;
       align-items: center;
@@ -235,7 +205,6 @@
     .typing-dot:nth-child(2) { animation-delay: 0.2s; }
     .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
-    /* INPUT */
     .input-wrapper {
       padding: 12px 14px;
       border-top: 1px solid #f3f4f6;
@@ -262,13 +231,8 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
-    .input-wrapper input::placeholder {
-      color: #9ca3af;
-    }
-
-    .input-wrapper input:disabled {
-      background: #f9fafb;
-    }
+    .input-wrapper input::placeholder { color: #9ca3af; }
+    .input-wrapper input:disabled { background: #f9fafb; }
 
     .send-btn {
       width: 38px;
@@ -286,20 +250,10 @@
       flex-shrink: 0;
     }
 
-    .send-btn:hover {
-      background: #1e40af;
-    }
+    .send-btn:hover { background: #1e40af; }
+    .send-btn:active { transform: scale(0.92); }
+    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .send-btn:active {
-      transform: scale(0.92);
-    }
-
-    .send-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* POWERED BY */
     .powered-by {
       text-align: center;
       padding: 6px;
@@ -309,12 +263,8 @@
       flex-shrink: 0;
     }
 
-    .powered-by span {
-      color: #2563eb;
-      font-weight: 600;
-    }
+    .powered-by span { color: #2563eb; font-weight: 600; }
 
-    /* ERROR STATE */
     .error-state {
       display: flex;
       flex-direction: column;
@@ -328,12 +278,8 @@
       gap: 8px;
     }
 
-    .error-state .error-icon {
-      font-size: 32px;
-      margin-bottom: 8px;
-    }
+    .error-state .error-icon { font-size: 32px; margin-bottom: 8px; }
 
-    /* ANIMATIONS */
     @keyframes bounceIn {
       0% { opacity: 0; transform: scale(0.3); }
       50% { transform: scale(1.15); }
@@ -362,35 +308,22 @@
     }
 
     @media (max-width: 400px) {
-      #chat-box {
-        width: calc(100vw - 24px);
-        right: 12px;
-        bottom: 84px;
-      }
-      #chat-toggle {
-        right: 12px;
-        bottom: 12px;
-      }
-      #notification-dot {
-        right: 12px;
-      }
+      #chat-box { width: calc(100vw - 24px); right: 12px; bottom: 84px; }
+      #chat-toggle { right: 12px; bottom: 12px; }
+      #notification-dot { right: 12px; }
     }
   </style>
 </head>
 <body>
 
-<!-- NOTIFICATION DOT -->
 <div id="notification-dot"></div>
-
-<!-- TOGGLE BUTTON -->
 <button id="chat-toggle" aria-label="Open chat">💬</button>
 
-<!-- CHAT BOX -->
 <div id="chat-box">
   <div id="chat-header">
     <div class="header-avatar">🤖</div>
     <div class="header-info">
-      <div class="header-name" id="headerName">Assistant</div>
+      <div class="header-name">Assistant</div>
       <div class="header-status">Online</div>
     </div>
     <button class="header-close" onclick="closeChat()" aria-label="Close chat">✕</button>
@@ -413,8 +346,6 @@
 
 <script>
   const API_URL = "https://store-support-backend-v2.onrender.com";
-
-  // Get business ID from URL parameter
   const BUSINESS_ID = new URLSearchParams(window.location.search).get("business_id");
 
   const chatToggle = document.getElementById("chat-toggle");
@@ -424,14 +355,14 @@
   const sendBtn = document.getElementById("sendBtn");
   const notificationDot = document.getElementById("notification-dot");
 
+  // Conversation history stored in memory
+  const conversationHistory = [];
+
   let openedOnce = false;
   let isOpen = false;
 
-  // Show notification dot after 3 seconds to grab attention
   setTimeout(() => {
-    if (!openedOnce) {
-      notificationDot.style.display = "block";
-    }
+    if (!openedOnce) notificationDot.style.display = "block";
   }, 3000);
 
   function getTime() {
@@ -462,9 +393,9 @@
           </div>
         `;
       } else {
-       if (messagesDiv.children.length === 0) {
-  addMessage("Hi 👋 How can I help you today?", "bot");
-}
+        if (messagesDiv.children.length === 0) {
+          addMessage("Hi 👋 How can I help you today?", "bot");
+        }
       }
       openedOnce = true;
     }
@@ -531,12 +462,26 @@
       const response = await fetch(`${API_URL}/widget/chat/${BUSINESS_ID}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({
+          message: message,
+          history: conversationHistory
+        })
       });
 
       const data = await response.json();
       removeTyping();
-      addMessage(data.reply || "No response", "bot");
+
+      const reply = data.reply || "No response";
+      addMessage(reply, "bot");
+
+      // Add to history after successful response
+      conversationHistory.push({ role: "user", content: message });
+      conversationHistory.push({ role: "assistant", content: reply });
+
+      // Keep history capped at last 20 messages
+      if (conversationHistory.length > 20) {
+        conversationHistory.splice(0, 2);
+      }
 
     } catch {
       removeTyping();

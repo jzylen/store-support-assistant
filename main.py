@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from openai import OpenAI
 from database import get_connection, init_db
 from contextlib import asynccontextmanager
+from typing import List, Optional
 import uuid
 import os
 import hmac
@@ -67,6 +68,7 @@ Returns: We accept returns within 30 days of purchase. Items must be unused and 
 Refunds: Refunds are processed within 5-7 business days after we receive the returned item.
 
 Always be friendly, helpful, and concise.
+Always respond in the same language the customer is writing in. Never switch languages mid conversation.
 """
 
 # =========================
@@ -82,8 +84,13 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
+class HistoryMessage(BaseModel):
+    role: str
+    content: str
+
 class ChatRequest(BaseModel):
     message: str
+    history: Optional[List[HistoryMessage]] = []
 
 class BusinessSetupRequest(BaseModel):
     data: str
@@ -120,8 +127,6 @@ def get_current_user(token: str):
 
 def check_and_reset_monthly_count(cursor, business_id, last_reset_at):
     now = datetime.utcnow()
-
-    # If never reset before or it's been more than a month
     if last_reset_at is None or (now.year > last_reset_at.year or now.month > last_reset_at.month):
         cursor.execute("""
             UPDATE businesses
@@ -130,7 +135,6 @@ def check_and_reset_monthly_count(cursor, business_id, last_reset_at):
             WHERE id = %s
         """, (now, business_id))
         return 0
-
     return None
 
 # =========================
@@ -260,9 +264,9 @@ def get_usage(credentials: HTTPAuthorizationCredentials = Security(security)):
     """, (email,))
 
     result = cursor.fetchone()
+    conn.close()
 
     if not result:
-        conn.close()
         raise HTTPException(status_code=404, detail="User not found")
 
     return {
@@ -335,13 +339,11 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
     if isinstance(last_reset_at, str):
         last_reset_at = datetime.fromisoformat(last_reset_at)
 
-    # Check and reset monthly count if needed
     reset_count = check_and_reset_monthly_count(cursor, business_id, last_reset_at)
     if reset_count is not None:
         message_count = reset_count
         conn.commit()
 
-    # Trial enforcement
     if subscription_status == "trialing":
         if datetime.utcnow() > trial_ends_at:
             cursor.execute("""
@@ -367,12 +369,22 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
         conn.close()
         return {"reply": "No business data configured yet."}
 
+    # Build messages array with history
+    messages = [{"role": "system", "content": business_data}]
+
+    # Add conversation history (cap at last 10 exchanges = 20 messages)
+    if data.history:
+        history = data.history[-20:]
+        for h in history:
+            if h.role in ["user", "assistant"]:
+                messages.append({"role": h.role, "content": h.content})
+
+    # Add current message
+    messages.append({"role": "user", "content": data.message})
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": business_data},
-            {"role": "user", "content": data.message}
-        ]
+        messages=messages
     )
 
     cursor.execute("""
@@ -420,7 +432,6 @@ def widget_chat(business_id: str, data: ChatRequest):
     if isinstance(last_reset_at, str):
         last_reset_at = datetime.fromisoformat(last_reset_at)
 
-    # Check and reset monthly count if needed
     reset_count = check_and_reset_monthly_count(cursor, business_id, last_reset_at)
     if reset_count is not None:
         message_count = reset_count
@@ -450,12 +461,22 @@ def widget_chat(business_id: str, data: ChatRequest):
         conn.close()
         return {"reply": "This assistant is not configured yet."}
 
+    # Build messages array with history
+    messages = [{"role": "system", "content": business_data}]
+
+    # Add conversation history (cap at last 20 messages)
+    if data.history:
+        history = data.history[-20:]
+        for h in history:
+            if h.role in ["user", "assistant"]:
+                messages.append({"role": h.role, "content": h.content})
+
+    # Add current message
+    messages.append({"role": "user", "content": data.message})
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": business_data},
-            {"role": "user", "content": data.message}
-        ]
+        messages=messages
     )
 
     cursor.execute("""
@@ -475,11 +496,18 @@ def widget_chat(business_id: str, data: ChatRequest):
 
 @app.post("/demo/chat")
 def demo_chat(data: ChatRequest):
+    messages = [{"role": "system", "content": DEMO_BUSINESS_DATA}]
+
+    if data.history:
+        history = data.history[-20:]
+        for h in history:
+            if h.role in ["user", "assistant"]:
+                messages.append({"role": h.role, "content": h.content})
+
+    messages.append({"role": "user", "content": data.message})
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": DEMO_BUSINESS_DATA},
-            {"role": "user", "content": data.message}
-        ]
+        messages=messages
     )
     return {"reply": response.choices[0].message.content}

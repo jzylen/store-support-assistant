@@ -796,7 +796,6 @@
 
   function buildSystemPrompt() {
     const botName = document.getElementById("bot_name").value.trim() || "Assistant";
-    const greeting = document.getElementById("greeting").value.trim();
 
     const personalityMap = {
       friendly: "You are friendly, warm and conversational. Use casual language and be approachable.",
@@ -850,9 +849,7 @@
     const prompt = `
 You are ${botName}, an AI customer support assistant. ${tone}
 
-IMPORTANT: Always respond in the same language the customer is writing in. Never switch languages mid conversation. If a customer writes in Spanish, respond in Spanish. If they write in French, respond in French. Always match their language automatically.
-
-${greeting ? `Your greeting message is: "${greeting}"` : ""}
+CRITICAL LANGUAGE RULE: Always respond in the exact same language the customer is writing in. If they write in Spanish, respond in Spanish. If they write in French, respond in French. If they write in English, respond in English. Never switch languages under any circumstances. Maintain the same language throughout the entire conversation.
 
 ${productsText}
 
@@ -870,7 +867,7 @@ ${supportPhone ? `Support Phone: ${supportPhone}` : ""}
 ${escalation ? `Escalation: ${escalation}` : ""}
 ${extraInfo ? `Additional Information: ${extraInfo}` : ""}
 
-Only answer questions based on the information provided above. If you don't know something, direct the customer to the support contact. Always stay in character and maintain your tone throughout the conversation.
+Only answer questions based on the information provided above. If you don't know something direct the customer to the support contact. Always stay in character and maintain your tone throughout the conversation.
     `.trim();
 
     return prompt;
