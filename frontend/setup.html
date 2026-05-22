@@ -98,6 +98,7 @@
       z-index: 2;
       transition: all 0.3s ease;
       position: relative;
+      cursor: pointer;
     }
 
     .step-dot.active {
@@ -126,9 +127,7 @@
       transition: color 0.3s ease;
     }
 
-    .step-label.active {
-      color: #2563eb;
-    }
+    .step-label.active { color: #2563eb; }
 
     .card {
       background: white;
@@ -138,13 +137,8 @@
       animation: fadeInUp 0.4s ease;
     }
 
-    .step-content {
-      display: none;
-    }
-
-    .step-content.active {
-      display: block;
-    }
+    .step-content { display: none; }
+    .step-content.active { display: block; }
 
     .section-title {
       font-size: 18px;
@@ -160,9 +154,7 @@
       line-height: 1.5;
     }
 
-    .form-group {
-      margin-bottom: 20px;
-    }
+    .form-group { margin-bottom: 20px; }
 
     label {
       display: block;
@@ -232,22 +224,9 @@
       background: #eff6ff;
     }
 
-    .personality-card .emoji {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-
-    .personality-card .name {
-      font-size: 13px;
-      font-weight: 700;
-      color: #111827;
-      margin-bottom: 4px;
-    }
-
-    .personality-card .desc {
-      font-size: 11px;
-      color: #6b7280;
-    }
+    .personality-card .emoji { font-size: 28px; margin-bottom: 8px; }
+    .personality-card .name { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+    .personality-card .desc { font-size: 11px; color: #6b7280; }
 
     .product-tabs {
       display: flex;
@@ -273,13 +252,8 @@
       border-color: #2563eb;
     }
 
-    .product-entry-mode {
-      display: none;
-    }
-
-    .product-entry-mode.active {
-      display: block;
-    }
+    .product-entry-mode { display: none; }
+    .product-entry-mode.active { display: block; }
 
     .product-list {
       display: flex;
@@ -315,9 +289,7 @@
       transition: opacity 0.2s;
     }
 
-    .remove-btn:hover {
-      opacity: 0.7;
-    }
+    .remove-btn:hover { opacity: 0.7; }
 
     .add-product-btn {
       width: 100%;
@@ -332,9 +304,7 @@
       transition: all 0.2s;
     }
 
-    .add-product-btn:hover {
-      background: #dbeafe;
-    }
+    .add-product-btn:hover { background: #dbeafe; }
 
     .hours-grid {
       display: flex;
@@ -356,10 +326,7 @@
       margin: 0;
     }
 
-    .hours-row input {
-      padding: 8px 10px;
-      font-size: 13px;
-    }
+    .hours-row input { padding: 8px 10px; font-size: 13px; }
 
     .closed-toggle {
       display: flex;
@@ -389,10 +356,7 @@
       transition: all 0.2s;
     }
 
-    .btn-back:hover {
-      border-color: #2563eb;
-      color: #2563eb;
-    }
+    .btn-back:hover { border-color: #2563eb; color: #2563eb; }
 
     .btn-next {
       flex: 2;
@@ -407,28 +371,11 @@
       transition: background 0.2s;
     }
 
-    .btn-next:hover {
-      background: #1e40af;
-    }
+    .btn-next:hover { background: #1e40af; }
+    .btn-next:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .btn-next:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .error {
-      color: #dc2626;
-      font-size: 13px;
-      margin-top: 12px;
-      text-align: center;
-    }
-
-    .success {
-      color: #16a34a;
-      font-size: 13px;
-      margin-top: 12px;
-      text-align: center;
-    }
+    .error { color: #dc2626; font-size: 13px; margin-top: 12px; text-align: center; }
+    .success { color: #16a34a; font-size: 13px; margin-top: 12px; text-align: center; }
 
     .divider {
       border: none;
@@ -436,13 +383,17 @@
       margin: 24px 0;
     }
 
-    .section-label {
+    /* RETURNING USER BANNER */
+    .returning-banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 12px 16px;
       font-size: 13px;
-      font-weight: 600;
-      color: #2563eb;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 20px;
+      color: #1d4ed8;
+      margin-bottom: 24px;
+      display: none;
+      animation: fadeIn 0.4s ease;
     }
 
     @keyframes fadeInDown {
@@ -479,14 +430,19 @@
     <p>Configure your assistant in detail so it knows your business inside out.</p>
   </div>
 
+  <!-- RETURNING USER BANNER -->
+  <div class="returning-banner" id="returningBanner">
+    ✏️ Your previous settings have been loaded. Navigate to any step to make changes and click Save & Continue when done.
+  </div>
+
   <div class="progress-wrapper">
     <div class="progress-steps" id="progressSteps">
       <div class="progress-fill" id="progressFill"></div>
-      <div class="step-dot active" id="dot-1">1</div>
-      <div class="step-dot" id="dot-2">2</div>
-      <div class="step-dot" id="dot-3">3</div>
-      <div class="step-dot" id="dot-4">4</div>
-      <div class="step-dot" id="dot-5">5</div>
+      <div class="step-dot active" id="dot-1" onclick="jumpToStep(1)">1</div>
+      <div class="step-dot" id="dot-2" onclick="jumpToStep(2)">2</div>
+      <div class="step-dot" id="dot-3" onclick="jumpToStep(3)">3</div>
+      <div class="step-dot" id="dot-4" onclick="jumpToStep(4)">4</div>
+      <div class="step-dot" id="dot-5" onclick="jumpToStep(5)">5</div>
     </div>
     <div class="step-labels">
       <span class="step-label active" id="label-1">Identity</span>
@@ -554,8 +510,8 @@
       <div class="section-subtitle">Tell your assistant about what you sell so it can answer product questions accurately.</div>
 
       <div class="product-tabs">
-        <button class="product-tab active" onclick="switchProductMode('structured', event)">Add by item</button>
-        <button class="product-tab" onclick="switchProductMode('freetext', event)">Free text</button>
+        <button class="product-tab active" id="tab-structured" onclick="switchProductMode('structured', event)">Add by item</button>
+        <button class="product-tab" id="tab-freetext" onclick="switchProductMode('freetext', event)">Free text</button>
       </div>
 
       <div class="product-entry-mode active" id="mode-structured">
@@ -697,6 +653,7 @@
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const hoursGrid = document.getElementById("hoursGrid");
 
+  // Build hours grid
   days.forEach(day => {
     const row = document.createElement("div");
     row.className = "hours-row";
@@ -712,22 +669,143 @@
     hoursGrid.appendChild(row);
   });
 
-  function toggleClosed(day) {
-    const closed = document.getElementById(`closed-${day}`).checked;
-    document.getElementById(`open-${day}`).disabled = closed;
-    document.getElementById(`close-${day}`).disabled = closed;
-    if (closed) {
-      document.getElementById(`open-${day}`).value = "";
-      document.getElementById(`close-${day}`).value = "";
+  // =========================
+  // LOCAL STORAGE SAVE
+  // =========================
+  function saveToLocalStorage() {
+    // Simple fields
+    localStorage.setItem("setup_bot_name", document.getElementById("bot_name").value);
+    localStorage.setItem("setup_greeting", document.getElementById("greeting").value);
+    localStorage.setItem("setup_personality", selectedPersonality);
+    localStorage.setItem("setup_product_mode", productMode);
+    localStorage.setItem("setup_products_freetext", document.getElementById("products_freetext").value);
+    localStorage.setItem("setup_shipping_time", document.getElementById("shipping_time").value);
+    localStorage.setItem("setup_shipping_cost", document.getElementById("shipping_cost").value);
+    localStorage.setItem("setup_order_tracking", document.getElementById("order_tracking").value);
+    localStorage.setItem("setup_returns", document.getElementById("returns").value);
+    localStorage.setItem("setup_refunds", document.getElementById("refunds").value);
+    localStorage.setItem("setup_promotions", document.getElementById("promotions").value);
+    localStorage.setItem("setup_support_email", document.getElementById("support_email").value);
+    localStorage.setItem("setup_support_phone", document.getElementById("support_phone").value);
+    localStorage.setItem("setup_escalation", document.getElementById("escalation").value);
+    localStorage.setItem("setup_extra_info", document.getElementById("extra_info").value);
+
+    // Structured products
+    const items = document.querySelectorAll(".product-item");
+    const products = [];
+    items.forEach(item => {
+      products.push({
+        name: item.querySelector(".product-name").value,
+        price: item.querySelector(".product-price").value,
+        stock: item.querySelector(".product-stock").value
+      });
+    });
+    localStorage.setItem("setup_products", JSON.stringify(products));
+
+    // Business hours
+    const hours = {};
+    days.forEach(day => {
+      hours[day] = {
+        open: document.getElementById(`open-${day}`).value,
+        close: document.getElementById(`close-${day}`).value,
+        closed: document.getElementById(`closed-${day}`).checked
+      };
+    });
+    localStorage.setItem("setup_hours", JSON.stringify(hours));
+  }
+
+  // =========================
+  // LOCAL STORAGE LOAD
+  // =========================
+  function loadFromLocalStorage() {
+    const botName = localStorage.getItem("setup_bot_name");
+
+    // If nothing saved yet, this is first time setup
+    if (!botName && botName !== "") return;
+
+    // Show returning user banner
+    document.getElementById("returningBanner").style.display = "block";
+
+    // Simple fields
+    document.getElementById("bot_name").value = localStorage.getItem("setup_bot_name") || "";
+    document.getElementById("greeting").value = localStorage.getItem("setup_greeting") || "";
+    document.getElementById("shipping_time").value = localStorage.getItem("setup_shipping_time") || "";
+    document.getElementById("shipping_cost").value = localStorage.getItem("setup_shipping_cost") || "";
+    document.getElementById("order_tracking").value = localStorage.getItem("setup_order_tracking") || "";
+    document.getElementById("returns").value = localStorage.getItem("setup_returns") || "";
+    document.getElementById("refunds").value = localStorage.getItem("setup_refunds") || "";
+    document.getElementById("promotions").value = localStorage.getItem("setup_promotions") || "";
+    document.getElementById("support_email").value = localStorage.getItem("setup_support_email") || "";
+    document.getElementById("support_phone").value = localStorage.getItem("setup_support_phone") || "";
+    document.getElementById("escalation").value = localStorage.getItem("setup_escalation") || "";
+    document.getElementById("extra_info").value = localStorage.getItem("setup_extra_info") || "";
+    document.getElementById("products_freetext").value = localStorage.getItem("setup_products_freetext") || "";
+
+    // Personality
+    const savedPersonality = localStorage.getItem("setup_personality");
+    if (savedPersonality) selectPersonality(savedPersonality);
+
+    // Product mode
+    const savedMode = localStorage.getItem("setup_product_mode");
+    if (savedMode && savedMode !== productMode) {
+      productMode = savedMode;
+      document.querySelectorAll(".product-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".product-entry-mode").forEach(m => m.classList.remove("active"));
+      document.getElementById(`tab-${savedMode}`).classList.add("active");
+      document.getElementById(`mode-${savedMode}`).classList.add("active");
+    }
+
+    // Structured products
+    const savedProducts = localStorage.getItem("setup_products");
+    if (savedProducts) {
+      const products = JSON.parse(savedProducts);
+      if (products.length > 0) {
+        const list = document.getElementById("productList");
+        list.innerHTML = "";
+        products.forEach(p => {
+          const item = document.createElement("div");
+          item.className = "product-item";
+          item.innerHTML = `
+            <input type="text" placeholder="Product name" class="product-name" value="${p.name}" />
+            <input type="text" placeholder="Price e.g. $29" class="product-price" value="${p.price}" />
+            <input type="text" placeholder="Stock e.g. 50 units" class="product-stock" value="${p.stock}" />
+            <button class="remove-btn" onclick="removeProduct(this)">×</button>
+          `;
+          list.appendChild(item);
+        });
+      }
+    }
+
+    // Business hours
+    const savedHours = localStorage.getItem("setup_hours");
+    if (savedHours) {
+      const hours = JSON.parse(savedHours);
+      days.forEach(day => {
+        if (hours[day]) {
+          document.getElementById(`open-${day}`).value = hours[day].open || "";
+          document.getElementById(`close-${day}`).value = hours[day].close || "";
+          document.getElementById(`closed-${day}`).checked = hours[day].closed || false;
+          if (hours[day].closed) {
+            document.getElementById(`open-${day}`).disabled = true;
+            document.getElementById(`close-${day}`).disabled = true;
+          }
+        }
+      });
     }
   }
 
+  // =========================
+  // PERSONALITY
+  // =========================
   function selectPersonality(type) {
     selectedPersonality = type;
     document.querySelectorAll(".personality-card").forEach(c => c.classList.remove("selected"));
     document.getElementById(`p-${type}`).classList.add("selected");
   }
 
+  // =========================
+  // PRODUCT MODE
+  // =========================
   function switchProductMode(mode, event) {
     productMode = mode;
     document.querySelectorAll(".product-tab").forEach(t => t.classList.remove("active"));
@@ -751,11 +829,22 @@
 
   function removeProduct(btn) {
     const list = document.getElementById("productList");
-    if (list.children.length > 1) {
-      btn.parentElement.remove();
+    if (list.children.length > 1) btn.parentElement.remove();
+  }
+
+  function toggleClosed(day) {
+    const closed = document.getElementById(`closed-${day}`).checked;
+    document.getElementById(`open-${day}`).disabled = closed;
+    document.getElementById(`close-${day}`).disabled = closed;
+    if (closed) {
+      document.getElementById(`open-${day}`).value = "";
+      document.getElementById(`close-${day}`).value = "";
     }
   }
 
+  // =========================
+  // STEP NAVIGATION
+  // =========================
   function nextStep(from) {
     if (from === 1 && !selectedPersonality) {
       alert("Please select a personality tone for your assistant.");
@@ -766,6 +855,14 @@
 
   function prevStep(from) {
     goToStep(from - 1);
+  }
+
+  // Allow clicking step dots to jump directly when returning
+  function jumpToStep(step) {
+    const hasData = localStorage.getItem("setup_bot_name") !== null;
+    if (hasData || step <= currentStep) {
+      goToStep(step);
+    }
   }
 
   function goToStep(step) {
@@ -794,6 +891,9 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  // =========================
+  // BUILD SYSTEM PROMPT
+  // =========================
   function buildSystemPrompt() {
     const botName = document.getElementById("bot_name").value.trim() || "Assistant";
 
@@ -873,6 +973,9 @@ Only answer questions based on the information provided above. If you don't know
     return prompt;
   }
 
+  // =========================
+  // SAVE SETUP
+  // =========================
   async function saveSetup() {
     const supportEmail = document.getElementById("support_email").value.trim();
     if (!supportEmail) {
@@ -898,6 +1001,9 @@ Only answer questions based on the information provided above. If you don't know
 
       if (!res.ok) throw new Error("Save failed");
 
+      // Save to localStorage so fields are pre-filled next time
+      saveToLocalStorage();
+
       document.getElementById("success").innerText = "Saved successfully! Redirecting...";
       setTimeout(() => {
         window.location.href = "success.html";
@@ -909,6 +1015,9 @@ Only answer questions based on the information provided above. If you don't know
       saveBtn.innerText = "Save & Continue →";
     }
   }
+
+  // Load saved data when page loads
+  loadFromLocalStorage();
 </script>
 
 </body>
