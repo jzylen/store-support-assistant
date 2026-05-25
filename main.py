@@ -63,6 +63,12 @@ PLAN_LIMITS = {
     "pro": 15000
 }
 
+PLAN_MODELS = {
+    "starter": {"model": "gpt-4o-mini", "max_tokens": 500},
+    "growth": {"model": "gpt-4o", "max_tokens": 1000},
+    "pro": {"model": "gpt-4o", "max_tokens": 2000}
+}
+
 DEMO_BUSINESS_DATA = """
 You are Relixo, a friendly and helpful assistant for the Relixo platform — an AI customer support platform for small businesses.
 
@@ -401,18 +407,19 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
     # Build messages array with history
     messages = [{"role": "system", "content": business_data}]
 
-    # Add conversation history (cap at last 10 exchanges = 20 messages)
     if data.history:
         history = data.history[-20:]
         for h in history:
             if h.role in ["user", "assistant"]:
                 messages.append({"role": h.role, "content": h.content})
 
-    # Add current message
     messages.append({"role": "user", "content": data.message})
 
+    # Use model based on plan
+    model_config = PLAN_MODELS.get(plan, PLAN_MODELS["starter"])
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=model_config["model"],
+        max_tokens=model_config["max_tokens"],
         messages=messages
     )
 
@@ -493,18 +500,19 @@ def widget_chat(business_id: str, data: ChatRequest):
     # Build messages array with history
     messages = [{"role": "system", "content": business_data}]
 
-    # Add conversation history (cap at last 20 messages)
     if data.history:
         history = data.history[-20:]
         for h in history:
             if h.role in ["user", "assistant"]:
                 messages.append({"role": h.role, "content": h.content})
 
-    # Add current message
     messages.append({"role": "user", "content": data.message})
 
+    # Use model based on plan
+    model_config = PLAN_MODELS.get(plan, PLAN_MODELS["starter"])
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=model_config["model"],
+        max_tokens=model_config["max_tokens"],
         messages=messages
     )
 
@@ -537,6 +545,7 @@ def demo_chat(data: ChatRequest):
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
+        max_tokens=500,
         messages=messages
     )
     return {"reply": response.choices[0].message.content}
