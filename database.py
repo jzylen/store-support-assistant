@@ -18,20 +18,20 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS businesses (
-        id TEXT PRIMARY KEY,
-        name TEXT,
-        business_type TEXT DEFAULT 'Other',
-        data TEXT,
-        plan TEXT DEFAULT 'starter',
-        message_count INTEGER DEFAULT 0,
-        subscription_status TEXT DEFAULT 'inactive',
-        trial_ends_at TIMESTAMP,
-        paddle_subscription_id TEXT,
-        created_at TIMESTAMP DEFAULT NOW(),
-        last_reset_at TIMESTAMP DEFAULT NOW()
-    );
-""")
+        CREATE TABLE IF NOT EXISTS businesses (
+            id TEXT PRIMARY KEY,
+            name TEXT,
+            business_type TEXT DEFAULT 'Other',
+            data TEXT,
+            plan TEXT DEFAULT 'starter',
+            message_count INTEGER DEFAULT 0,
+            subscription_status TEXT DEFAULT 'inactive',
+            trial_ends_at TIMESTAMP,
+            paddle_subscription_id TEXT,
+            created_at TIMESTAMP DEFAULT NOW(),
+            last_reset_at TIMESTAMP DEFAULT NOW()
+        );
+    """)
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
@@ -44,10 +44,10 @@ def init_db():
     """)
 
     # Add business_type column if it doesn't exist
-cursor.execute("""
-    ALTER TABLE businesses 
-    ADD COLUMN IF NOT EXISTS business_type TEXT DEFAULT 'Other';
-""")
+    cursor.execute("""
+        ALTER TABLE businesses
+        ADD COLUMN IF NOT EXISTS business_type TEXT DEFAULT 'Other';
+    """)
 
     conn.commit()
     cursor.close()
