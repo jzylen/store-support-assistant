@@ -139,8 +139,9 @@
     }
 
     .form-group:nth-child(1) { animation-delay: 0.1s; }
-    .form-group:nth-child(2) { animation-delay: 0.2s; }
-    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(2) { animation-delay: 0.15s; }
+    .form-group:nth-child(3) { animation-delay: 0.2s; }
+    .form-group:nth-child(4) { animation-delay: 0.25s; }
 
     label {
       display: block;
@@ -170,6 +171,32 @@
       border-color: #dc2626;
     }
 
+    select {
+      width: 100%;
+      padding: 11px 14px;
+      font-size: 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      color: #111827;
+      background: white;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+    }
+
+    select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    select.error-field {
+      border-color: #dc2626;
+    }
+
     /* PASSWORD WRAPPER */
     .password-wrapper {
       position: relative;
@@ -195,14 +222,10 @@
       align-items: center;
     }
 
-    .eye-btn:hover {
-      color: #2563eb;
-    }
+    .eye-btn:hover { color: #2563eb; }
 
     /* PASSWORD STRENGTH */
-    .password-strength {
-      margin-top: 8px;
-    }
+    .password-strength { margin-top: 8px; }
 
     .strength-bar {
       height: 4px;
@@ -241,13 +264,8 @@
       transition: color 0.2s;
     }
 
-    .requirement.met {
-      color: #16a34a;
-    }
-
-    .requirement .req-icon {
-      font-size: 12px;
-    }
+    .requirement.met { color: #16a34a; }
+    .requirement .req-icon { font-size: 12px; }
 
     /* SUBMIT BTN */
     .submit-btn {
@@ -266,20 +284,10 @@
       overflow: hidden;
     }
 
-    .submit-btn:hover {
-      background: #1e40af;
-    }
+    .submit-btn:hover { background: #1e40af; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .submit-btn:active {
-      transform: scale(0.98);
-    }
-
-    .submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    /* LOADING SPINNER */
     .spinner {
       display: inline-block;
       width: 16px;
@@ -313,9 +321,7 @@
       font-weight: 600;
     }
 
-    .login-link a:hover {
-      text-decoration: underline;
-    }
+    .login-link a:hover { text-decoration: underline; }
 
     /* ANIMATIONS */
     @keyframes fadeIn {
@@ -379,12 +385,28 @@
     <p class="subtitle">Get started for free. No credit card required.</p>
 
     <div class="form-group">
-      <label>Store name</label>
+      <label>Store / Business Name</label>
       <input
         id="businessName"
         type="text"
         placeholder="e.g. Urban Streetwear"
       />
+    </div>
+
+    <div class="form-group">
+      <label>Business Type</label>
+      <select id="businessType">
+        <option value="" disabled selected>Select your business type</option>
+        <option value="Online Store">Online Store</option>
+        <option value="Restaurant">Restaurant</option>
+        <option value="Hotel">Hotel</option>
+        <option value="Service Business">Service Business</option>
+        <option value="Healthcare">Healthcare</option>
+        <option value="Real Estate">Real Estate</option>
+        <option value="Education">Education</option>
+        <option value="Beauty & Wellness">Beauty & Wellness</option>
+        <option value="Other">Other</option>
+      </select>
     </div>
 
     <div class="form-group">
@@ -410,7 +432,6 @@
         </button>
       </div>
 
-      <!-- STRENGTH BAR -->
       <div class="password-strength">
         <div class="strength-bar">
           <div class="strength-fill" id="strengthFill"></div>
@@ -449,7 +470,6 @@
   const API_URL = "https://store-support-backend-v2.onrender.com";
   let passwordVisible = false;
 
-  // Toggle password visibility
   function togglePassword() {
     const input = document.getElementById("password");
     const btn = document.getElementById("eyeBtn");
@@ -458,7 +478,6 @@
     btn.innerText = passwordVisible ? "🙈" : "👁";
   }
 
-  // Password strength checker
   function checkPasswordStrength() {
     const password = document.getElementById("password").value;
     const fill = document.getElementById("strengthFill");
@@ -469,7 +488,6 @@
     const hasNumber = /[0-9]/.test(password);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-    // Update requirements
     updateRequirement("req-length", hasLength);
     updateRequirement("req-upper", hasUpper);
     updateRequirement("req-number", hasNumber);
@@ -497,20 +515,25 @@
     el.querySelector(".req-icon").innerText = met ? "✓" : "○";
   }
 
-  // Register handler
   async function handleRegister() {
     const errorDiv = document.getElementById("error");
     const createBtn = document.getElementById("createBtn");
     errorDiv.innerText = "";
 
     const business_name = document.getElementById("businessName").value.trim();
+    const business_type = document.getElementById("businessType").value;
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
-    // Validation
     if (!business_name) {
-      errorDiv.innerText = "Please enter your store name.";
+      errorDiv.innerText = "Please enter your business name.";
       document.getElementById("businessName").classList.add("error-field");
+      return;
+    }
+
+    if (!business_type) {
+      errorDiv.innerText = "Please select your business type.";
+      document.getElementById("businessType").classList.add("error-field");
       return;
     }
 
@@ -532,7 +555,7 @@
       const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ business_name, email, password })
+        body: JSON.stringify({ business_name, business_type, email, password })
       });
 
       const data = await res.json();
@@ -556,9 +579,13 @@
     }
   }
 
-  // Clear error state on input
   document.getElementById("businessName").addEventListener("input", () => {
     document.getElementById("businessName").classList.remove("error-field");
+    document.getElementById("error").innerText = "";
+  });
+
+  document.getElementById("businessType").addEventListener("change", () => {
+    document.getElementById("businessType").classList.remove("error-field");
     document.getElementById("error").innerText = "";
   });
 
@@ -567,7 +594,6 @@
     document.getElementById("error").innerText = "";
   });
 
-  // Enter key support
   document.addEventListener("keypress", (e) => {
     if (e.key === "Enter") handleRegister();
   });

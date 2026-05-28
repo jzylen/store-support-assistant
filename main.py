@@ -114,6 +114,7 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     password: str
     business_name: str
+    business_type: Optional[str] = "Other"
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -189,19 +190,20 @@ def register(data: RegisterRequest):
 
     try:
         cursor.execute("""
-            INSERT INTO businesses 
-            (id, name, created_at, plan, message_count, subscription_status, trial_ends_at, last_reset_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """, (
-            business_id,
-            data.business_name,
-            datetime.utcnow(),
-            "starter",
-            0,
-            "trialing",
-            trial_end,
-            datetime.utcnow()
-        ))
+    INSERT INTO businesses 
+    (id, name, business_type, created_at, plan, message_count, subscription_status, trial_ends_at, last_reset_at)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+""", (
+    business_id,
+    data.business_name,
+    data.business_type,
+    datetime.utcnow(),
+    "starter",
+    0,
+    "trialing",
+    trial_end,
+    datetime.utcnow()
+))
 
         cursor.execute("""
             INSERT INTO users (email, password_hash, business_id, created_at)
