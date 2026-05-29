@@ -14,8 +14,6 @@ import os
 import hmac
 import hashlib
 import json
-import hmac
-import hashlib
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -202,20 +200,20 @@ def register(data: RegisterRequest):
 
     try:
         cursor.execute("""
-    INSERT INTO businesses 
-    (id, name, business_type, created_at, plan, message_count, subscription_status, trial_ends_at, last_reset_at)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-""", (
-    business_id,
-    data.business_name,
-    data.business_type,
-    datetime.utcnow(),
-    "starter",
-    0,
-    "trialing",
-    trial_end,
-    datetime.utcnow()
-))
+            INSERT INTO businesses
+            (id, name, business_type, created_at, plan, message_count, subscription_status, trial_ends_at, last_reset_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            business_id,
+            data.business_name,
+            data.business_type,
+            datetime.utcnow(),
+            "starter",
+            0,
+            "trialing",
+            trial_end,
+            datetime.utcnow()
+        ))
 
         cursor.execute("""
             INSERT INTO users (email, password_hash, business_id, created_at)
@@ -306,12 +304,10 @@ def get_usage(credentials: HTTPAuthorizationCredentials = Security(security)):
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT b.id, b.data, b.plan, b.message_count,
-           b.subscription_status, b.trial_ends_at, b.last_reset_at,
-           u.is_admin
-    FROM users u
-    JOIN businesses b ON u.business_id = b.id
-    WHERE u.email = %s
+        SELECT b.plan, b.message_count, b.subscription_status, b.trial_ends_at, b.last_reset_at
+        FROM users u
+        JOIN businesses b ON u.business_id = b.id
+        WHERE u.email = %s
     """, (email,))
 
     result = cursor.fetchone()
@@ -364,7 +360,8 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
 
     cursor.execute("""
         SELECT b.id, b.data, b.plan, b.message_count,
-               b.subscription_status, b.trial_ends_at, b.last_reset_at
+               b.subscription_status, b.trial_ends_at, b.last_reset_at,
+               u.is_admin
         FROM users u
         JOIN businesses b ON u.business_id = b.id
         WHERE u.email = %s
@@ -384,45 +381,45 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
     trial_ends_at = result["trial_ends_at"]
     last_reset_at = result["last_reset_at"]
     is_admin = result["is_admin"]
-   
+
     if isinstance(trial_ends_at, str):
         trial_ends_at = datetime.fromisoformat(trial_ends_at)
 
     if isinstance(last_reset_at, str):
         last_reset_at = datetime.fromisoformat(last_reset_at)
 
-# Admin bypass — skip all limits and trial enforcement
+    # Admin bypass — skip all limits and trial enforcement
     if not is_admin:
         reset_count = check_and_reset_monthly_count(cursor, business_id, last_reset_at)
-    if reset_count is not None:
-        message_count = reset_count
-        conn.commit()
-
-    if subscription_status == "trialing":
-        if datetime.utcnow() > trial_ends_at:
-            cursor.execute("""
-                UPDATE businesses
-                SET subscription_status = 'expired'
-                WHERE id = %s
-            """, (business_id,))
+        if reset_count is not None:
+            message_count = reset_count
             conn.commit()
+
+        if subscription_status == "trialing":
+            if datetime.utcnow() > trial_ends_at:
+                cursor.execute("""
+                    UPDATE businesses
+                    SET subscription_status = 'expired'
+                    WHERE id = %s
+                """, (business_id,))
+                conn.commit()
+                conn.close()
+                return {"reply": "Your free trial has expired. Please upgrade to continue using Relixo."}
+
+        elif subscription_status not in ["active", "trialing"]:
             conn.close()
-            return {"reply": "Your free trial has expired. Please upgrade to continue using Relixo."}
+            return {"reply": "Subscription inactive. Please upgrade to continue."}
 
-    elif subscription_status not in ["active", "trialing"]:
-        conn.close()
-        return {"reply": "Subscription inactive. Please upgrade to continue."}
+        limit = PLAN_LIMITS.get(plan, 1000)
 
-    limit = PLAN_LIMITS.get(plan, 1000)
-
-    if message_count >= limit:
-        conn.close()
-        return {"reply": f"You have reached your {plan} plan limit of {limit} messages this month."}
+        if message_count >= limit:
+            conn.close()
+            return {"reply": f"You have reached your {plan} plan limit of {limit} messages this month."}
 
     if not business_data:
         conn.close()
         return {"reply": "No business data configured yet."}
-   
+
     # Build messages array with history
     messages = [{"role": "system", "content": business_data}]
 
@@ -555,7 +552,6 @@ async def paddle_webhook(request: Request):
     payload = await request.body()
     signature = request.headers.get("paddle-signature", "")
 
-    # Parse signature
     ts = None
     h1 = None
     for part in signature.split(";"):
@@ -567,7 +563,6 @@ async def paddle_webhook(request: Request):
     if not ts or not h1:
         raise HTTPException(status_code=400, detail="Invalid signature format")
 
-    # Verify signature
     signed_payload = f"{ts}:{payload.decode('utf-8')}"
     expected = hmac.new(
         PADDLE_WEBHOOK_SECRET.encode(),
@@ -578,7 +573,6 @@ async def paddle_webhook(request: Request):
     if not hmac.compare_digest(expected, h1):
         raise HTTPException(status_code=400, detail="Signature mismatch")
 
-    # Parse event
     data = json.loads(payload)
     event_type = data.get("event_type", "")
     subscription = data.get("data", {})
@@ -587,7 +581,6 @@ async def paddle_webhook(request: Request):
     customer_email = subscription.get("customer", {}).get("email")
     status = subscription.get("status")
 
-    # Map Paddle status to Relixo status
     status_map = {
         "active": "active",
         "trialing": "trialing",
@@ -596,7 +589,6 @@ async def paddle_webhook(request: Request):
         "paused": "inactive"
     }
 
-    # Get plan from price ID
     items = subscription.get("items", [])
     price_id = items[0].get("price", {}).get("id") if items else None
     plan = PADDLE_PRICE_TO_PLAN.get(price_id, "starter")
@@ -606,13 +598,13 @@ async def paddle_webhook(request: Request):
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            UPDATE businesses
+            UPDATE businesses b
             SET subscription_status = %s,
                 plan = %s,
                 paddle_subscription_id = %s
-            FROM users
-            WHERE users.business_id = businesses.id
-            AND users.email = %s
+            FROM users u
+            WHERE u.business_id = b.id
+            AND u.email = %s
         """, (app_status, plan, paddle_subscription_id, customer_email))
         conn.commit()
         conn.close()
