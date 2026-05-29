@@ -13,6 +13,9 @@ import uuid
 import os
 import hmac
 import hashlib
+import json
+import hmac
+import hashlib
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -51,6 +54,15 @@ TRIAL_DAYS = 7
 
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY environment variable is not set!")
+
+PADDLE_WEBHOOK_SECRET = os.getenv("PADDLE_WEBHOOK_SECRET")
+PADDLE_SECRET_KEY = os.getenv("PADDLE_SECRET_KEY")
+
+PADDLE_PRICE_TO_PLAN = {
+    os.getenv("PADDLE_STARTER_PRICE_ID"): "starter",
+    os.getenv("PADDLE_GROWTH_PRICE_ID"): "growth",
+    os.getenv("PADDLE_PRO_PRICE_ID"): "pro"
+}
 
 pwd_context = CryptContext(
     schemes=["argon2"],
@@ -533,6 +545,79 @@ def widget_chat(business_id: str, data: ChatRequest):
     conn.close()
 
     return {"reply": response.choices[0].message.content}
+
+# =========================
+# PADDLE WEBHOOK
+# =========================
+
+@app.post("/paddle/webhook")
+async def paddle_webhook(request: Request):
+    payload = await request.body()
+    signature = request.headers.get("paddle-signature", "")
+
+    # Parse signature
+    ts = None
+    h1 = None
+    for part in signature.split(";"):
+        if part.startswith("ts="):
+            ts = part[3:]
+        elif part.startswith("h1="):
+            h1 = part[3:]
+
+    if not ts or not h1:
+        raise HTTPException(status_code=400, detail="Invalid signature format")
+
+    # Verify signature
+    signed_payload = f"{ts}:{payload.decode('utf-8')}"
+    expected = hmac.new(
+        PADDLE_WEBHOOK_SECRET.encode(),
+        signed_payload.encode(),
+        hashlib.sha256
+    ).hexdigest()
+
+    if not hmac.compare_digest(expected, h1):
+        raise HTTPException(status_code=400, detail="Signature mismatch")
+
+    # Parse event
+    data = json.loads(payload)
+    event_type = data.get("event_type", "")
+    subscription = data.get("data", {})
+
+    paddle_subscription_id = subscription.get("id")
+    customer_email = subscription.get("customer", {}).get("email")
+    status = subscription.get("status")
+
+    # Map Paddle status to Relixo status
+    status_map = {
+        "active": "active",
+        "trialing": "trialing",
+        "canceled": "inactive",
+        "past_due": "inactive",
+        "paused": "inactive"
+    }
+
+    # Get plan from price ID
+    items = subscription.get("items", [])
+    price_id = items[0].get("price", {}).get("id") if items else None
+    plan = PADDLE_PRICE_TO_PLAN.get(price_id, "starter")
+    app_status = status_map.get(status, "inactive")
+
+    if customer_email:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE businesses
+            SET subscription_status = %s,
+                plan = %s,
+                paddle_subscription_id = %s
+            FROM users
+            WHERE users.business_id = businesses.id
+            AND users.email = %s
+        """, (app_status, plan, paddle_subscription_id, customer_email))
+        conn.commit()
+        conn.close()
+
+    return {"status": "ok"}
 
 # =========================
 # PUBLIC DEMO ENDPOINT
