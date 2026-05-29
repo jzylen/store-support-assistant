@@ -294,10 +294,12 @@ def get_usage(credentials: HTTPAuthorizationCredentials = Security(security)):
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT b.plan, b.message_count, b.subscription_status, b.trial_ends_at, b.last_reset_at
-        FROM users u
-        JOIN businesses b ON u.business_id = b.id
-        WHERE u.email = %s
+    SELECT b.id, b.data, b.plan, b.message_count,
+           b.subscription_status, b.trial_ends_at, b.last_reset_at,
+           u.is_admin
+    FROM users u
+    JOIN businesses b ON u.business_id = b.id
+    WHERE u.email = %s
     """, (email,))
 
     result = cursor.fetchone()
@@ -369,14 +371,17 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
     subscription_status = result["subscription_status"]
     trial_ends_at = result["trial_ends_at"]
     last_reset_at = result["last_reset_at"]
-
+    is_admin = result["is_admin"]
+   
     if isinstance(trial_ends_at, str):
         trial_ends_at = datetime.fromisoformat(trial_ends_at)
 
     if isinstance(last_reset_at, str):
         last_reset_at = datetime.fromisoformat(last_reset_at)
 
-    reset_count = check_and_reset_monthly_count(cursor, business_id, last_reset_at)
+# Admin bypass — skip all limits and trial enforcement
+    if not is_admin:
+        reset_count = check_and_reset_monthly_count(cursor, business_id, last_reset_at)
     if reset_count is not None:
         message_count = reset_count
         conn.commit()
@@ -405,7 +410,7 @@ def chat(data: ChatRequest, credentials: HTTPAuthorizationCredentials = Security
     if not business_data:
         conn.close()
         return {"reply": "No business data configured yet."}
-
+   
     # Build messages array with history
     messages = [{"role": "system", "content": business_data}]
 

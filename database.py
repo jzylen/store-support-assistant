@@ -49,6 +49,12 @@ def init_db():
         ADD COLUMN IF NOT EXISTS business_type TEXT DEFAULT 'Other';
     """)
 
+    # Add is_admin column if it doesn't exist
+    cursor.execute("""
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
+    """)
+
     conn.commit()
     cursor.close()
     conn.close()
