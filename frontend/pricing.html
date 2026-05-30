@@ -533,7 +533,6 @@
     yearly:  { starter: "$15", growth: "$39", pro: "$79" }
   };
 
-  // Initialize Paddle in sandbox mode
   Paddle.Environment.set("sandbox");
   Paddle.Initialize({
     token: "test_463d54070b306404c7b10aac18d"
@@ -565,28 +564,17 @@
     item.classList.toggle("open");
   }
 
-  async function selectPlan(plan) {
+  function selectPlan(plan) {
     if (!token) {
       window.location.href = "create.html";
       return;
     }
 
-    try {
-      // Get user email from usage endpoint
-      const res = await fetch(`${API_URL}/business/usage`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      const data = await res.json();
-
-      Paddle.Checkout.open({
-        items: [{ priceId: PRICE_IDS[plan], quantity: 1 }],
-        settings: {
-          successUrl: "https://getrelixo.com/success"
-        }
-      });
-
-    } catch (err) {
-      alert("Something went wrong. Please try again.");
-    }
+    Paddle.Checkout.open({
+      items: [{ priceId: PRICE_IDS[plan], quantity: 1 }],
+      settings: {
+        successUrl: "https://getrelixo.com/success"
+      }
+    });
   }
 </script>
