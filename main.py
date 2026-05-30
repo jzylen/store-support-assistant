@@ -598,18 +598,16 @@ async def paddle_webhook(request: Request):
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            UPDATE businesses b
+            UPDATE businesses
             SET subscription_status = %s,
                 plan = %s,
                 paddle_subscription_id = %s
-            FROM users u
-            WHERE u.business_id = b.id
-            AND u.email = %s
-        """, (app_status, plan, paddle_subscription_id, customer_email))
+            WHERE id = (
+                SELECT business_id FROM users WHERE email = %s
+            )
+       """, (app_status, plan, paddle_subscription_id, customer_email))
         conn.commit()
         conn.close()
-
-    return {"status": "ok"}
 
 # =========================
 # PUBLIC DEMO ENDPOINT
