@@ -575,39 +575,75 @@ async def paddle_webhook(request: Request):
 
     data = json.loads(payload)
     event_type = data.get("event_type", "")
-    subscription = data.get("data", {})
+    event_data = data.get("data", {})
 
-    paddle_subscription_id = subscription.get("id")
-    customer_email = subscription.get("customer", {}).get("email")
-    status = subscription.get("status")
+    # Handle transaction.completed
+    if event_type == "transaction.completed":
+        subscription_id = event_data.get("subscription_id")
+        customer_email = event_data.get("customer", {}).get("email")
+        items = event_data.get("items", [])
+        price_id = items[0].get("price", {}).get("id") if items else None
+        plan = PADDLE_PRICE_TO_PLAN.get(price_id, "starter")
 
-    status_map = {
-        "active": "active",
-        "trialing": "trialing",
-        "canceled": "inactive",
-        "past_due": "inactive",
-        "paused": "inactive"
-    }
+        if subscription_id and customer_email:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE businesses
+                SET subscription_status = 'active',
+                    plan = %s,
+                    paddle_subscription_id = %s
+                WHERE id = (
+                    SELECT business_id FROM users WHERE email = %s
+                )
+            """, (plan, subscription_id, customer_email))
+            conn.commit()
+            conn.close()
 
-    items = subscription.get("items", [])
-    price_id = items[0].get("price", {}).get("id") if items else None
-    plan = PADDLE_PRICE_TO_PLAN.get(price_id, "starter")
-    app_status = status_map.get(status, "inactive")
+    # Handle subscription events
+    elif event_type in ["subscription.created", "subscription.updated"]:
+        subscription_id = event_data.get("id")
+        status = event_data.get("status")
+        items = event_data.get("items", [])
+        price_id = items[0].get("price", {}).get("id") if items else None
+        plan = PADDLE_PRICE_TO_PLAN.get(price_id, "starter")
 
-    if customer_email:
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE businesses
-            SET subscription_status = %s,
-                plan = %s,
-                paddle_subscription_id = %s
-            WHERE id = (
-                SELECT business_id FROM users WHERE email = %s
-            )
-       """, (app_status, plan, paddle_subscription_id, customer_email))
-        conn.commit()
-        conn.close()
+        status_map = {
+            "active": "active",
+            "trialing": "trialing",
+            "canceled": "inactive",
+            "past_due": "inactive",
+            "paused": "inactive"
+        }
+        app_status = status_map.get(status, "inactive")
+
+        if subscription_id:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE businesses
+                SET subscription_status = %s,
+                    plan = %s,
+                    paddle_subscription_id = %s
+                WHERE paddle_subscription_id = %s
+            """, (app_status, plan, subscription_id, subscription_id))
+            conn.commit()
+            conn.close()
+
+    elif event_type == "subscription.canceled":
+        subscription_id = event_data.get("id")
+        if subscription_id:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE businesses
+                SET subscription_status = 'inactive'
+                WHERE paddle_subscription_id = %s
+            """, (subscription_id,))
+            conn.commit()
+            conn.close()
+
+    return {"status": "ok"}
 
 # =========================
 # PUBLIC DEMO ENDPOINT

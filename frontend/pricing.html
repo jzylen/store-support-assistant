@@ -18,7 +18,6 @@
       min-height: 100vh;
     }
 
-    /* NAVBAR */
     .navbar {
       background: white;
       border-bottom: 1px solid #e5e7eb;
@@ -48,11 +47,8 @@
       transition: color 0.2s;
     }
 
-    .navbar a:hover {
-      color: #2563eb;
-    }
+    .navbar a:hover { color: #2563eb; }
 
-    /* HEADER */
     .page-header {
       text-align: center;
       padding: 56px 20px 40px;
@@ -86,7 +82,6 @@
       animation: pulse 2s infinite;
     }
 
-    /* BILLING TOGGLE */
     .billing-toggle {
       display: flex;
       align-items: center;
@@ -102,9 +97,7 @@
       color: #6b7280;
     }
 
-    .billing-toggle span.active {
-      color: #111827;
-    }
+    .billing-toggle span.active { color: #111827; }
 
     .toggle-switch {
       width: 44px;
@@ -117,9 +110,7 @@
       border: none;
     }
 
-    .toggle-switch.yearly {
-      background: #2563eb;
-    }
+    .toggle-switch.yearly { background: #2563eb; }
 
     .toggle-knob {
       width: 18px;
@@ -133,9 +124,7 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
 
-    .toggle-switch.yearly .toggle-knob {
-      transform: translateX(20px);
-    }
+    .toggle-switch.yearly .toggle-knob { transform: translateX(20px); }
 
     .save-badge {
       background: #dcfce7;
@@ -146,7 +135,6 @@
       border-radius: 20px;
     }
 
-    /* PRICING GRID */
     .pricing-grid {
       max-width: 1000px;
       margin: 0 auto;
@@ -186,9 +174,7 @@
       transform: translateY(-8px);
     }
 
-    .plan.featured:hover {
-      transform: translateY(-14px);
-    }
+    .plan.featured:hover { transform: translateY(-14px); }
 
     .popular-badge {
       position: absolute;
@@ -298,20 +284,15 @@
       transform: scale(1.02);
     }
 
-    .plan-btn:active {
-      transform: scale(0.98);
-    }
+    .plan-btn:active { transform: scale(0.98); }
 
     .plan.featured .plan-btn {
       background: white;
       color: #2563eb;
     }
 
-    .plan.featured .plan-btn:hover {
-      background: #eff6ff;
-    }
+    .plan.featured .plan-btn:hover { background: #eff6ff; }
 
-    /* FAQ */
     .faq {
       max-width: 640px;
       margin: 0 auto 60px;
@@ -343,9 +324,7 @@
     .faq-item:nth-child(2) { animation-delay: 0.7s; }
     .faq-item:nth-child(3) { animation-delay: 0.8s; }
 
-    .faq-item:hover {
-      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1);
-    }
+    .faq-item:hover { box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1); }
 
     .faq-header {
       display: flex;
@@ -365,9 +344,7 @@
       transition: transform 0.3s;
     }
 
-    .faq-item.open .faq-arrow {
-      transform: rotate(180deg);
-    }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
 
     .faq-body {
       font-size: 13px;
@@ -383,7 +360,6 @@
       margin-top: 10px;
     }
 
-    /* ANIMATIONS */
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -412,20 +388,17 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar">
   <span class="logo">Relixo</span>
   <a href="dashboard.html">← Back to Dashboard</a>
 </nav>
 
-<!-- HEADER -->
 <div class="page-header">
   <h1>Simple, Transparent Pricing</h1>
   <p>Start with a free trial. No credit card required. Cancel anytime.</p>
   <span class="trial-note">🎉 All plans include a 7-day free trial</span>
 </div>
 
-<!-- BILLING TOGGLE -->
 <div class="billing-toggle">
   <span class="active" id="monthlyLabel">Monthly</span>
   <button class="toggle-switch" id="billingToggle" onclick="toggleBilling()">
@@ -435,10 +408,8 @@
   <span class="save-badge">Save 20%</span>
 </div>
 
-<!-- PRICING GRID -->
 <div class="pricing-grid">
 
-  <!-- STARTER -->
   <div class="plan">
     <h2>Starter</h2>
     <div class="price" id="price-starter">$19<span>/mo</span></div>
@@ -454,7 +425,6 @@
     <button class="plan-btn" onclick="selectPlan('starter')">Start Free Trial</button>
   </div>
 
-  <!-- GROWTH (FEATURED) -->
   <div class="plan featured">
     <div class="popular-badge">Most Popular</div>
     <h2>Growth</h2>
@@ -471,7 +441,6 @@
     <button class="plan-btn" onclick="selectPlan('growth')">Start Free Trial</button>
   </div>
 
-  <!-- PRO -->
   <div class="plan">
     <h2>Pro</h2>
     <div class="price" id="price-pro">$99<span>/mo</span></div>
@@ -489,7 +458,6 @@
 
 </div>
 
-<!-- FAQ -->
 <div class="faq">
   <h2>Frequently Asked Questions</h2>
 
@@ -564,17 +532,32 @@
     item.classList.toggle("open");
   }
 
-  function selectPlan(plan) {
+  async function selectPlan(plan) {
     if (!token) {
       window.location.href = "create.html";
       return;
     }
 
-    Paddle.Checkout.open({
-      items: [{ priceId: PRICE_IDS[plan], quantity: 1 }],
-      settings: {
-        successUrl: "https://getrelixo.com/success"
-      }
-    });
+    try {
+      // Decode email from JWT token
+      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+      const email = tokenPayload.sub;
+
+      Paddle.Checkout.open({
+        items: [{ priceId: PRICE_IDS[plan], quantity: 1 }],
+        customer: {
+          email: email
+        },
+        settings: {
+          successUrl: "https://getrelixo.com/payment-success.html"
+        }
+      });
+
+    } catch (err) {
+      alert("Something went wrong. Please try again.");
+    }
   }
 </script>
+
+</body>
+</html>
